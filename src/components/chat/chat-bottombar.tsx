@@ -2,14 +2,11 @@
 
 import React from "react";
 import { ChatProps } from "./chat";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "../ui/button";
 import TextareaAutosize from "react-textarea-autosize";
 import { motion, AnimatePresence } from "framer-motion";
-import { Textarea } from "../ui/textarea";
-import { EmojiPicker } from "../emoji-picker";
 import { ImageIcon, PaperPlaneIcon, StopIcon } from "@radix-ui/react-icons";
 
 export default function ChatBottombar({

@@ -1,9 +1,7 @@
 "use client";
 
 import { ChatLayout } from "@/components/chat/chat-layout";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogHeader, DialogTitle, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import UsernameForm from "@/components/username-form";
 import { ChatRequestOptions } from "ai";
 import { useChat } from "ai/react";
