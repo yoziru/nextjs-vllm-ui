@@ -1,0 +1,7 @@
+.next/
+node_modules/
+.env
+next-env.d.ts
+Dockerfile
+.dockerignore
+Makefile

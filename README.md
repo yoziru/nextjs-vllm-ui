@@ -1,9 +1,11 @@
+# nextjs-vllm-ui
+
 <div align="center">
   <img src="ollama-nextjs-ui.gif">
 </div>
 
 <h1 align="center">
-  Fully-featured & beautiful web interface for Ollama LLMs
+  Fully-featured & beautiful web interface for vLLM
 </h1>
 
 Get up and running with Large Language Models **quickly**, **locally** and even **offline**.
@@ -30,10 +32,20 @@ https://github.com/jakobhoeg/nextjs-ollama-llm-ui/assets/114422072/08eaed4f-9deb
 
 To use the web interface, these requisites must be met:
 
-1. Download [Ollama](https://ollama.com/download) and have it running. Or run it in a Docker container. Check the [docs](https://github.com/ollama/ollama) for instructions.
+1. Download [vLLM](https://docs.vllm.ai/en/latest/) and have it running. Or run it in a Docker container. 
 2. Node.js (18+) and npm is required. [Download](https://nodejs.org/en/download)
 
-# Installation 📖
+# Usage 🚀
+
+The easiest way to get started is to use the pre-built Docker image.
+
+```
+docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:8000 yoziru/nextjs-vllm-ui:latest
+```
+
+Then go to [localhost:3000](http://localhost:3000) and start chatting with your favourite model!
+
+# Development 📖
 
 To install and run a local environment of the web interface, follow the instructions below.
 
@@ -58,7 +70,7 @@ mv .example.env .env
 **4. If your instance of Ollama is NOT running on the default ip-address and port, change the variable in the .env file to fit your usecase:**
 
 ```
-VLLM_URL="http://localhost:11434"
+VLLM_URL="http://localhost:8000"
 ```
 
 **5. Install dependencies:**
@@ -74,15 +86,6 @@ npm run dev
 ```
 
 **5. Go to [localhost:3000](http://localhost:3000) and start chatting with your favourite model!**
-
-# Upcoming features
-
-This is a to-do list consisting of upcoming features.
-- ⬜️ Ability to send an image in the prompt to utilize vision language models.
-- ⬜️ Ability to regenerate responses
-- ⬜️ Import and export chats
-- ⬜️ Voice input support
-- ✅ Code syntax highlighting
 
 # Tech stack
 

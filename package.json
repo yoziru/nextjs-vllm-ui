@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-ollama-local-ai",
+  "name": "nextjs-vllm-ui",
   "version": "0.1.0",
   "private": true,
   "scripts": {
