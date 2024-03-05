@@ -5,3 +5,4 @@ next-env.d.ts
 Dockerfile
 .dockerignore
 Makefile
+.github
