@@ -4,7 +4,6 @@ import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatRequestOptions } from "ai";
 import { useChat } from "ai/react";
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
 
 export default function Page({ params }: { params: { id: string } }) {
   const {
@@ -27,7 +26,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setMessages(JSON.parse(item));
       }
     }
-  }, [setMessages]);
+  }, [setMessages, params.id]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,7 +53,7 @@ export default function Page({ params }: { params: { id: string } }) {
       // Trigger the storage event to update the sidebar component
       window.dispatchEvent(new Event("storage"));
     }
-  }, [messages, chatId, isLoading, error]);
+  }, [messages, chatId, isLoading, error, params.id]);
 
   return (
     <main className="flex h-[calc(100dvh)] flex-col items-center">

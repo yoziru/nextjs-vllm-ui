@@ -16,22 +16,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { DownloadIcon } from "@radix-ui/react-icons";
-import PullModelForm from "./pull-model-form";
+import { MixIcon } from "@radix-ui/react-icons";
+import SystemPromptForm from "./system-prompt-form";
 
-export default function PullModel() {
-
+export default function SystemPrompt() {
   return (
     <Dialog>
       <DialogTrigger asChild>
         <div className="flex w-full gap-2 p-1 items-center cursor-pointer">
-          <DownloadIcon className="w-4 h-4" />
-          <p>Pull model</p>
+          <MixIcon className="w-4 h-4" />
+          <p>System Prompt</p>
         </div>
       </DialogTrigger>
       <DialogContent className="space-y-2">
-      <DialogTitle>Pull Model</DialogTitle>
-          <PullModelForm />
+        <DialogTitle>Pull Model</DialogTitle>
+        <SystemPromptForm />
       </DialogContent>
     </Dialog>
   );

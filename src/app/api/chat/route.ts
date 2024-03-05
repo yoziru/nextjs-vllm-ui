@@ -1,15 +1,18 @@
 import { StreamingTextResponse, Message } from "ai";
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
 import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import { BytesOutputParser } from "@langchain/core/output_parsers";
-
+import { ChatOpenAI } from "@langchain/openai";
 
 export async function POST(req: Request) {
   const { messages, selectedModel } = await req.json();
 
-  const model = new ChatOllama({
-    baseUrl: process.env.OLLAMA_URL,
-    model: selectedModel,
+  const baseUrl = process.env.VLLM_URL + "/v1";
+  const model = new ChatOpenAI({
+    openAIApiKey: "foo",
+    configuration: {
+      baseURL: baseUrl,
+    },
+    modelName: selectedModel,
   });
 
   const parser = new BytesOutputParser();
@@ -23,8 +26,6 @@ export async function POST(req: Request) {
           : new AIMessage(m.content)
       )
     );
-
-    console.log(stream);
 
   return new StreamingTextResponse(stream);
 }

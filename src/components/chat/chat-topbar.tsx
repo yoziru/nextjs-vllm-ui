@@ -46,17 +46,17 @@ export default function ChatTopbar({
 
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/tags", {
+        const res = await fetch("/api/models", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             "cache-control": "no-cache",
           },
         });
-        
+
         const data = await res.json();
         // Extract the "name" field from each model object and store them in the state
-        const modelNames = data.models.map((model: any) => model.name);
+        const modelNames = data.data.map((model: any) => model.id);
         setModels(modelNames);
 
         if (!localStorage.getItem("selectedModel")) {
@@ -73,7 +73,7 @@ export default function ChatTopbar({
       }
     };
     fetchData();
-  }, []);
+  }, [setSelectedModel]);
 
   const handleModelChange = (model: string) => {
     setCurrentModel(model);
@@ -105,13 +105,13 @@ export default function ChatTopbar({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-[170px] justify-between"
+            className="w-[300px] justify-between"
           >
             {currentModel || "Select model"}
             <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[170px] p-1">
+        <PopoverContent className="w-[300px] p-1">
           {models.length > 0 ? (
             models.map((model) => (
               <Button
