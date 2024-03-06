@@ -8,10 +8,7 @@ import { Message } from "ai/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import SidebarSkeleton from "./sidebar-skeleton";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import UserSettings from "./user-settings";
-import { useLocalStorageData } from "@/app/hooks/useLocalStorageData";
-import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +22,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { TrashIcon } from "@radix-ui/react-icons";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -44,7 +40,6 @@ export function Sidebar({
   const [localChats, setLocalChats] = useState<
     { chatId: string; messages: Message[] }[]
   >([]);
-  // const localChatss = useLocalStorageData("chat_", []);
   const [selectedChatId, setSselectedChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

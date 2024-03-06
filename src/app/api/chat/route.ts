@@ -7,6 +7,47 @@ import {
 import { BytesOutputParser } from "@langchain/core/output_parsers";
 import { ChatOpenAI } from "@langchain/openai";
 
+const addSystemMessage = (messages: Message[], systemPrompt?: string) => {
+  // early exit if system prompt is empty
+  if (!systemPrompt || systemPrompt === "") {
+    return messages;
+  }
+
+  // add system prompt to the chat (if it's not already there)
+  // check first message in the chat
+  if (!messages) {
+    // if there are no messages, add the system prompt as the first message
+    messages = [
+      {
+        id: "1",
+        content: systemPrompt,
+        role: "system",
+      },
+    ];
+  } else if (messages.length === 0) {
+    // if there are no messages, add the system prompt as the first message
+    messages.push({
+      id: "1",
+      content: systemPrompt,
+      role: "system",
+    });
+  } else {
+    // if there are messages, check if the first message is a system prompt
+    if (messages[0].role === "system") {
+      // if the first message is a system prompt, update it
+      messages[0].content = systemPrompt;
+    } else {
+      // if the first message is not a system prompt, add the system prompt as the first message
+      messages.unshift({
+        id: "1",
+        content: systemPrompt,
+        role: "system",
+      });
+    }
+  }
+  return messages;
+};
+
 const formatMessages = (messages: Message[]) => {
   return messages.map((m) => {
     if (m.role === "system") {
@@ -20,7 +61,10 @@ const formatMessages = (messages: Message[]) => {
 };
 
 export async function POST(req: Request) {
-  const { messages, selectedModel } = await req.json();
+  const { messages, chatOptions } = await req.json();
+  if (!chatOptions.selectedModel || chatOptions.selectedModel === "") {
+    throw new Error("Selected model is required");
+  }
 
   const baseUrl = process.env.VLLM_URL + "/v1";
   const model = new ChatOpenAI({
@@ -28,11 +72,15 @@ export async function POST(req: Request) {
     configuration: {
       baseURL: baseUrl,
     },
-    modelName: selectedModel,
+    modelName: chatOptions.selectedModel,
+    temperature: chatOptions.temperature,
   });
 
   const parser = new BytesOutputParser();
-  const stream = await model.pipe(parser).stream(formatMessages(messages));
+  const formattedMessages = formatMessages(
+    addSystemMessage(messages, chatOptions.systemPrompt)
+  );
+  const stream = await model.pipe(parser).stream(formattedMessages);
 
   return new StreamingTextResponse(stream);
 }

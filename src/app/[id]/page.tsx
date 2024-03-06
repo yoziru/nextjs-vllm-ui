@@ -4,6 +4,8 @@ import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatRequestOptions } from "ai";
 import { useChat } from "ai/react";
 import React from "react";
+import useLocalStorageState from "use-local-storage-state";
+import { ChatOptions } from "@/components/chat/chat-options";
 
 export default function Page({ params }: { params: { id: string } }) {
   const {
@@ -17,7 +19,16 @@ export default function Page({ params }: { params: { id: string } }) {
     setMessages,
   } = useChat();
   const [chatId, setChatId] = React.useState<string>("");
-  const [selectedModel, setSelectedModel] = React.useState<string>("mistral");
+  const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
+    "chatOptions",
+    {
+      defaultValue: {
+        selectedModel: "",
+        systemPrompt: "",
+        temperature: 0.9,
+      },
+    }
+  );
 
   React.useEffect(() => {
     if (params.id) {
@@ -37,7 +48,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const requestOptions: ChatRequestOptions = {
       options: {
         body: {
-          selectedModel: selectedModel,
+          chatOptions: chatOptions,
         },
       },
     };
@@ -59,7 +70,8 @@ export default function Page({ params }: { params: { id: string } }) {
     <main className="flex h-[calc(100dvh)] flex-col items-center">
       <ChatLayout
         chatId={params.id}
-        setSelectedModel={setSelectedModel}
+        chatOptions={chatOptions}
+        setChatOptions={setChatOptions}
         messages={messages}
         input={input}
         handleInputChange={handleInputChange}

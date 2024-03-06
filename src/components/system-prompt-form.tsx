@@ -13,20 +13,19 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
-import { Input } from "./ui/input";
 import TextareaAutosize from "react-textarea-autosize";
-
+import { SystemPromptProps } from "./system-prompt";
 const formSchema = z.object({
   name: z.string().min(1, {
-    message: "Please select a model to pull",
+    message: "Please set a system prompt",
   }),
 });
 
-export default function SystemPromptForm() {
-  // get system prompt from local storage
-  const systemPrompt = localStorage.getItem("systemPrompt") ?? "";
-
+export default function SystemPromptForm({
+  chatOptions,
+  setChatOptions,
+}: SystemPromptProps) {
+  const systemPrompt = chatOptions ? chatOptions.systemPrompt : "";
   const [name, setName] = useState(systemPrompt);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -35,7 +34,7 @@ export default function SystemPromptForm() {
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     // set system prompt to local storage
-    localStorage.setItem("systemPrompt", data.name);
+    setChatOptions({ ...chatOptions, systemPrompt: data.name });
     toast.success("System prompt saved");
   }
 
@@ -56,24 +55,27 @@ export default function SystemPromptForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full items-center flex relative gap-2"
+        className="w-full items-center relative gap-2"
       >
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="w-full flex flex-col">
               <FormLabel>System Prompt</FormLabel>
-              {/* a multi-line input */}
-              <TextareaAutosize
-                {...field}
-                autoComplete="off"
-                value={name}
-                onKeyDown={handleKeyPress}
-                onChange={(e) => handleChange(e)}
-                name="message"
-                placeholder="You are a helpful assistant."
-              />
+              <div>
+                <TextareaAutosize
+                  {...field}
+                  className="w-full p-2 border rounded-md"
+                  autoComplete="off"
+                  rows={3}
+                  value={name}
+                  onKeyDown={handleKeyPress}
+                  onChange={(e) => handleChange(e)}
+                  name="message"
+                  placeholder="You are a helpful assistant."
+                />
+              </div>
               <FormMessage />
             </FormItem>
           )}

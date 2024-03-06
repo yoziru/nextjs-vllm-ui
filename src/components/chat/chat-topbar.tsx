@@ -6,41 +6,35 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 import { Button } from "../ui/button";
 import { CaretSortIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Sidebar } from "../sidebar";
 import { Message } from "ai/react";
+import SystemPrompt from "../system-prompt";
+import { ChatOptions } from "./chat-options";
 
 interface ChatTopbarProps {
-  setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
+  chatOptions: ChatOptions;
+  setChatOptions: React.Dispatch<React.SetStateAction<ChatOptions>>;
   isLoading: boolean;
   chatId?: string;
   messages: Message[];
 }
 
 export default function ChatTopbar({
-  setSelectedModel,
+  chatOptions,
+  setChatOptions,
   isLoading,
   chatId,
   messages,
 }: ChatTopbarProps) {
   const [models, setModels] = React.useState<string[]>([]);
   const [open, setOpen] = React.useState(false);
-  const [currentModel, setCurrentModel] = React.useState<string | null>(null);
+  const currentModel = chatOptions && chatOptions.selectedModel;
 
   useEffect(() => {
-    const getLocalStorageModel = localStorage.getItem("selectedModel");
-    if (getLocalStorageModel) {
-      setCurrentModel(getLocalStorageModel);
-      setSelectedModel(getLocalStorageModel);
-    }
-
     const fetchData = async () => {
       try {
         const res = await fetch("/api/models", {
@@ -56,26 +50,20 @@ export default function ChatTopbar({
         const modelNames = data.data.map((model: any) => model.id);
         setModels(modelNames);
 
-        if (!localStorage.getItem("selectedModel")) {
-          // save the first model in the list as selectedModel in localstorage
-          setCurrentModel(modelNames[0]);
-          setSelectedModel(modelNames[0]);
-
-          localStorage.setItem("selectedModel", modelNames[0]);
-        }
+        // if (!chatOptions || chatOptions.selectedModel === "") {
+        //   // save the first model in the list as selectedModel in localstorage
+        //   setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
+        // }
       } catch (error) {
-        console.error("Error fetching models:", error);
-        setCurrentModel("Select model");
+        // setChatOptions({ ...chatOptions, selectedModel: "Select model" });
         setModels([]);
       }
     };
     fetchData();
-  }, [setSelectedModel]);
+  }, [chatOptions, setChatOptions]);
 
   const handleModelChange = (model: string) => {
-    setCurrentModel(model);
-    setSelectedModel(model);
-    localStorage.setItem("selectedModel", model);
+    setChatOptions({ ...chatOptions, selectedModel: model });
     setOpen(false);
   };
 
@@ -95,40 +83,46 @@ export default function ChatTopbar({
         </SheetContent>
       </Sheet>
 
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            disabled={isLoading}
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[300px] justify-between"
-          >
-            {currentModel || "Select model"}
-            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-1">
-          {models.length > 0 ? (
-            models.map((model) => (
-              <Button
-                key={model}
-                variant="ghost"
-                className="w-full"
-                onClick={() => {
-                  handleModelChange(model);
-                }}
-              >
-                {model}
-              </Button>
-            ))
-          ) : (
-            <Button variant="ghost" disabled className=" w-full">
-              No models available
+      <div className="flex items-center gap-4">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              disabled={isLoading}
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-[300px] justify-between"
+            >
+              {currentModel || "Select model"}
+              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
-          )}
-        </PopoverContent>
-      </Popover>
+          </PopoverTrigger>
+          <PopoverContent className="w-[300px] p-1">
+            {models.length > 0 ? (
+              models.map((model) => (
+                <Button
+                  key={model}
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => {
+                    handleModelChange(model);
+                  }}
+                >
+                  {model}
+                </Button>
+              ))
+            ) : (
+              <Button variant="ghost" disabled className=" w-full">
+                No models available
+              </Button>
+            )}
+          </PopoverContent>
+        </Popover>
+        <SystemPrompt
+          chatOptions={chatOptions}
+          setChatOptions={setChatOptions}
+        />
+      </div>
     </div>
   );
 }
