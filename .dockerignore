@@ -6,3 +6,4 @@ Dockerfile
 .dockerignore
 Makefile
 .github
+.git
