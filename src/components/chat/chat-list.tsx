@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ChatProps } from "./chat";
@@ -64,20 +63,8 @@ export default function ChatList({
         {messages
           .filter((message) => message.role !== "system")
           .map((message, index) => (
-            <motion.div
+            <div
               key={index}
-              layout
-              initial={{ opacity: 0, scale: 1, y: 20, x: 0 }}
-              animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-              exit={{ opacity: 0, scale: 1, y: 20, x: 0 }}
-              transition={{
-                opacity: { duration: 0.1 },
-                layout: {
-                  type: "spring",
-                  bounce: 0.3,
-                  duration: messages.indexOf(message) * 0.05 + 0.2,
-                },
-              }}
               className={cn(
                 "flex flex-col gap-2 p-4 whitespace-pre-wrap",
                 message.role === "user" ? "items-end" : "items-start"
@@ -139,7 +126,7 @@ export default function ChatList({
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
           ))}
       </div>
       <div id="anchor" ref={bottomRef}></div>

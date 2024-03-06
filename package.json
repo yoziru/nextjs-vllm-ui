@@ -9,8 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@emoji-mart/data": "^1.1.2",
-    "@emoji-mart/react": "^1.1.1",
     "@hookform/resolvers": "^3.3.4",
     "@langchain/community": "^0.0.34",
     "@langchain/core": "^0.1.35",
@@ -27,8 +25,6 @@
     "ai": "^3.0.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "emoji-mart": "^5.5.2",
-    "framer-motion": "^11.0.3",
     "langchain": "^0.1.13",
     "lucide-react": "^0.344.0",
     "next": "14.1.2",
