@@ -68,7 +68,7 @@ export default function ChatTopbar({
   };
 
   return (
-    <div className="w-full flex px-4 py-6  items-center justify-between lg:justify-center ">
+    <div className="w-full flex px-4 py-6 items-center justify-between lg:justify-center">
       <Sheet>
         <SheetTrigger>
           <HamburgerMenuIcon className="lg:hidden w-5 h-5" />
@@ -91,13 +91,13 @@ export default function ChatTopbar({
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="w-[300px] justify-between"
+              className="w-full justify-between"
             >
               {currentModel || "Select model"}
               <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[300px] p-1">
+          <PopoverContent className="w-full p-1">
             {models.length > 0 ? (
               models.map((model) => (
                 <Button

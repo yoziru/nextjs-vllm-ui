@@ -14,7 +14,7 @@ export default function SystemPrompt({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="flex w-[160px] gap-2 p-1 items-center cursor-pointer rounded-md border">
+        <div className="flex w-full gap-2 p-1 items-center cursor-pointer rounded-md border">
           <MixIcon className="w-4 h-4" />
           <p>System Prompt</p>
         </div>
