@@ -5,6 +5,11 @@ ENV YARN_CACHE_FOLDER=/opt/yarncache
 WORKDIR /opt/app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
+# patch logging for requestHandler
+RUN sed -Ei \
+    -e '/await requestHandler/iconst __start = new Date;' \
+    -e '/await requestHandler/aconsole.log(`[${__start.toISOString()}] ${((new Date - __start) / 1000).toFixed(3)} ${req.method} ${req.url}`);' \
+    node_modules/next/dist/server/lib/start-server.js
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
