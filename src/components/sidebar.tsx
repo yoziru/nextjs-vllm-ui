@@ -132,7 +132,7 @@ export function Sidebar({
               {localChats.map(({ chatId, messages }, index) => (
                 <Link
                   key={index}
-                  href={`/${chatId.substr(5)}`}
+                  href={`/chats/${chatId.substring(5)}`}
                   className={cn(
                     {
                       [buttonVariants({ variant: "secondaryLink" })]:
