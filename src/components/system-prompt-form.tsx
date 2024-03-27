@@ -17,9 +17,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import { SystemPromptProps } from "./system-prompt";
 import { DialogClose } from "@radix-ui/react-dialog";
 const formSchema = z.object({
-  name: z.string().min(1, {
-    message: "Please set a system prompt",
-  }),
+  name: z.string(),
 });
 
 export default function SystemPromptForm({
@@ -36,7 +34,7 @@ export default function SystemPromptForm({
   function onSubmit(data: z.infer<typeof formSchema>) {
     // set system prompt to local storage
     setChatOptions({ ...chatOptions, systemPrompt: data.name });
-    toast.success("System prompt saved");
+    toast.success("System prompt updated.");
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -50,6 +48,11 @@ export default function SystemPromptForm({
       e.preventDefault();
       onSubmit(form.getValues());
     }
+  };
+
+  const clearSystemPrompt = () => {
+    setName("");
+    form.setValue("name", "");
   };
 
   return (
@@ -67,7 +70,7 @@ export default function SystemPromptForm({
               <div>
                 <TextareaAutosize
                   {...field}
-                  className="w-full p-2 border rounded-xs"
+                  className="w-full p-2 border-2 border-sky-500 rounded-sm h-full my-4"
                   autoComplete="off"
                   rows={3}
                   value={name}
@@ -81,9 +84,17 @@ export default function SystemPromptForm({
             </FormItem>
           )}
         />
-        <DialogClose className="space-y-2 w-full">
-          <Button type="submit" className="w-full">
-            Save system prompt
+        <DialogClose className="w-full flex gap-4">
+          <Button
+            onClick={clearSystemPrompt}
+            variant="ghost"
+            className="w-full"
+            size="sm"
+          >
+            Clear
+          </Button>
+          <Button type="submit" variant="default" className="w-full" size="sm">
+            Save
           </Button>
         </DialogClose>
       </form>

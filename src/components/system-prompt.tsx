@@ -26,7 +26,6 @@ export default function SystemPrompt({
         </Button>
       </DialogTrigger>
       <DialogContent className="space-y-2">
-        <DialogTitle>Save system prompt</DialogTitle>
         <SystemPromptForm
           chatOptions={chatOptions}
           setChatOptions={setChatOptions}

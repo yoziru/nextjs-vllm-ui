@@ -60,34 +60,6 @@ const formatMessages = (messages: Message[]): Message[] => {
   });
 };
 
-// export async function POST(req: NextRequest) {
-//   const { messages, chatOptions } = await req.json();
-//   if (!chatOptions.selectedModel || chatOptions.selectedModel === "") {
-//     throw new Error("Selected model is required");
-//   }
-
-//   const baseUrl = process.env.VLLM_URL + "/v1";
-//   const model = new ChatOpenAI({
-//     openAIApiKey: "foo",
-//     configuration: {
-//       baseURL: baseUrl,
-//     },
-//     modelName: chatOptions.selectedModel,
-//     temperature: chatOptions.temperature,
-//   });
-
-//   const parser = new BytesOutputParser();
-//   const formattedMessages = formatMessages(
-//     addSystemMessage(messages, chatOptions.systemPrompt)
-//   );
-//   try {
-//     const stream = await model.pipe(parser).stream(formattedMessages);
-//     return new StreamingTextResponse(stream);
-//   } catch (e: any) {
-//     return NextResponse.json({ error: e.message }, { status: e.status ?? 500 });
-//   }
-// }
-
 export async function POST(req: NextRequest) {
   try {
     const { messages, chatOptions } = await req.json();

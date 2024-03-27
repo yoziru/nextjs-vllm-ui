@@ -31,7 +31,7 @@ export default function ClearChatsButton() {
 
   return (
     <Dialog>
-      <DialogTrigger className="w-full">
+      <DialogTrigger className="w-full" disabled={disabled}>
         <Button
           className="justify-start gap-2 w-full hover:bg-destructive/30 hover:text-red-500"
           size="sm"
