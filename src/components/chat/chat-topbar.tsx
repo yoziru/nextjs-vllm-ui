@@ -32,37 +32,34 @@ export default function ChatTopbar({
 }: ChatTopbarProps) {
   const currentModel = chatOptions && chatOptions.selectedModel;
 
-  const handleModelChange = (model: string | undefined) => {
-    setChatOptions({ ...chatOptions, selectedModel: model });
+  const fetchData = async () => {
+    try {
+      const res = await fetch(basePath + "/api/models", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "cache-control": "no-cache",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(res.status + " " + res.statusText);
+      }
+
+      const data = await res.json();
+      // Extract the "name" field from each model object and store them in the state
+      const modelNames = data.data.map((model: any) => model.id);
+      // save the first and only model in the list as selectedModel in localstorage
+      setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
+    } catch (error) {
+      setChatOptions({ ...chatOptions, selectedModel: undefined });
+      toast.error("Connection to vLLM server failed: " + error);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(basePath + "/api/models", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "cache-control": "no-cache",
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error(res.status + " " + res.statusText);
-        }
-
-        const data = await res.json();
-        // Extract the "name" field from each model object and store them in the state
-        const modelNames = data.data.map((model: any) => model.id);
-        // save the first and only model in the list as selectedModel in localstorage
-        handleModelChange(modelNames[0]);
-      } catch (error) {
-        handleModelChange(undefined);
-        toast.error("Connection to vLLM server failed: " + error);
-      }
-    };
     fetchData();
-  }, [chatOptions, setChatOptions, handleModelChange]);
+  }, []);
 
   return (
     <div className="w-full flex px-4 py-6 items-center justify-between lg:justify-center">
