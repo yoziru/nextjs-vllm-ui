@@ -43,7 +43,7 @@ The easiest way to get started is to use the pre-built Docker image.
 docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:8000 ghcr.io/yoziru/nextjs-vllm-ui:latest
 ```
 
-Then go to [localhost:3000](http://localhost:3000) and start chatting with your favourite model!
+Then go to [localhost:3000](http://localhost:3000/vllm) and start chatting with your favourite model!
 
 # Development 📖
 
