@@ -6,6 +6,7 @@ import { useChat } from "ai/react";
 import React from "react";
 import useLocalStorageState from "use-local-storage-state";
 import { ChatOptions } from "@/components/chat/chat-options";
+import { basePath } from "@/lib/utils";
 
 export default function Page({ params }: { params: { id: string } }) {
   const {
@@ -17,7 +18,7 @@ export default function Page({ params }: { params: { id: string } }) {
     error,
     stop,
     setMessages,
-  } = useChat();
+  } = useChat({ api: basePath + "/api/chat" });
   const [chatId, setChatId] = React.useState<string>("");
   const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
     "chatOptions",
