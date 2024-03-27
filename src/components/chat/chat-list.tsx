@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { basePath, cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ChatProps } from "./chat";
 import Image from "next/image";
@@ -40,7 +40,7 @@ export default function ChatList({
       <div className="w-full h-full flex justify-center items-center">
         <div className="flex flex-col gap-4 items-center">
           <Image
-            src="/ollama.png"
+            src={basePath + "/ollama.png"}
             alt="AI"
             width={60}
             height={60}
@@ -94,7 +94,7 @@ export default function ChatList({
                   <div className="flex items-end gap-2">
                     <Avatar className="flex justify-start items-center">
                       <AvatarImage
-                        src="/ollama.png"
+                        src={basePath + "/ollama.png"}
                         alt="AI"
                         width={6}
                         height={6}

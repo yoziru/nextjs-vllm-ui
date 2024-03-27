@@ -14,6 +14,7 @@ import { Sidebar } from "../sidebar";
 import { Message } from "ai/react";
 import SystemPrompt from "../system-prompt";
 import { ChatOptions } from "./chat-options";
+import { basePath } from "@/lib/utils";
 
 interface ChatTopbarProps {
   chatOptions: ChatOptions;
@@ -37,7 +38,7 @@ export default function ChatTopbar({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/models", {
+        const res = await fetch(basePath + "/api/models", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

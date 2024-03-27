@@ -6,6 +6,7 @@ import {
 } from "@langchain/core/messages";
 import { BytesOutputParser } from "@langchain/core/output_parsers";
 import { ChatOpenAI } from "@langchain/openai";
+import { NextRequest, NextResponse } from "next/server";
 
 const addSystemMessage = (messages: Message[], systemPrompt?: string) => {
   // early exit if system prompt is empty
@@ -60,7 +61,7 @@ const formatMessages = (messages: Message[]) => {
   });
 };
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { messages, chatOptions } = await req.json();
   if (!chatOptions.selectedModel || chatOptions.selectedModel === "") {
     throw new Error("Selected model is required");
@@ -80,7 +81,10 @@ export async function POST(req: Request) {
   const formattedMessages = formatMessages(
     addSystemMessage(messages, chatOptions.systemPrompt)
   );
-  const stream = await model.pipe(parser).stream(formattedMessages);
-
-  return new StreamingTextResponse(stream);
+  try {
+    const stream = await model.pipe(parser).stream(formattedMessages);
+    return new StreamingTextResponse(stream);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: e.status ?? 500 });
+  }
 }

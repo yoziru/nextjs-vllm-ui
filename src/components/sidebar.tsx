@@ -1,8 +1,8 @@
 "use client";
-
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { basePath, cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Message } from "ai/react";
 import Image from "next/image";
@@ -40,6 +40,7 @@ export function Sidebar({
   const [localChats, setLocalChats] = useState<
     { chatId: string; messages: Message[] }[]
   >([]);
+  const router = useRouter();
   const [selectedChatId, setSselectedChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -102,7 +103,9 @@ export function Sidebar({
       <div className=" flex flex-col justify-between p-2 max-h-fit overflow-y-auto">
         <Button
           onClick={() => {
-            window.location.replace("/");
+            router.push("/");
+            // Clear messages
+            messages.splice(0, messages.length);
           }}
           variant="ghost"
           className="flex justify-between w-full h-14 text-sm xl:text-lg font-normal items-center "
@@ -110,7 +113,7 @@ export function Sidebar({
           <div className="flex gap-3 items-center ">
             {!isCollapsed && !isMobile && (
               <Image
-                src="/ollama.png"
+                src={basePath + "/ollama.png"}
                 alt="AI"
                 width={28}
                 height={28}

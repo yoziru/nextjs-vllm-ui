@@ -15,6 +15,7 @@ import React, { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import useLocalStorageState from "use-local-storage-state";
 import { ChatOptions } from "@/components/chat/chat-options";
+import { basePath } from "@/lib/utils";
 
 export default function Home() {
   const {
@@ -26,7 +27,7 @@ export default function Home() {
     error,
     stop,
     setMessages,
-  } = useChat();
+  } = useChat({ api: basePath + "/api/chat" });
   const [chatId, setChatId] = React.useState<string>("");
   const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
     "chatOptions",
