@@ -1,21 +1,14 @@
 "use client";
 
 import { ChatLayout } from "@/components/chat/chat-layout";
-import {
-  Dialog,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogContent,
-} from "@/components/ui/dialog";
-import UsernameForm from "@/components/username-form";
 import { ChatRequestOptions } from "ai";
 import { useChat } from "ai/react";
-import React, { useEffect } from "react";
+import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import useLocalStorageState from "use-local-storage-state";
 import { ChatOptions } from "@/components/chat/chat-options";
 import { basePath } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function Home() {
   const {
@@ -27,7 +20,12 @@ export default function Home() {
     error,
     stop,
     setMessages,
-  } = useChat({ api: basePath + "/api/chat" });
+  } = useChat({
+    api: basePath + "/api/chat",
+    onError: (error) => {
+      toast.error("Something went wrong: " + error);
+    },
+  });
   const [chatId, setChatId] = React.useState<string>("");
   const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
     "chatOptions",
@@ -40,8 +38,6 @@ export default function Home() {
     }
   );
 
-  const [open, setOpen] = React.useState(false);
-
   React.useEffect(() => {
     if (!isLoading && !error && chatId && messages.length > 0) {
       // Save messages to local storage
@@ -50,12 +46,6 @@ export default function Home() {
       window.dispatchEvent(new Event("storage"));
     }
   }, [messages, chatId, isLoading, error]);
-
-  useEffect(() => {
-    if (!localStorage.getItem("ollama_user")) {
-      setOpen(true);
-    }
-  }, []);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,32 +73,20 @@ export default function Home() {
 
   return (
     <main className="flex h-[calc(100dvh)] flex-col items-center ">
-      <Dialog open={open} onOpenChange={setOpen}>
-        <ChatLayout
-          chatId=""
-          chatOptions={chatOptions}
-          setChatOptions={setChatOptions}
-          messages={messages}
-          input={input}
-          handleInputChange={handleInputChange}
-          handleSubmit={onSubmit}
-          isLoading={isLoading}
-          error={error}
-          stop={stop}
-          navCollapsedSize={10}
-          defaultLayout={[30, 160]}
-        />
-        <DialogContent className="flex flex-col space-y-4">
-          <DialogHeader className="space-y-2">
-            <DialogTitle>Welcome to Ollama!</DialogTitle>
-            <DialogDescription>
-              Enter your name to get started. This is just to personalize your
-              experience.
-            </DialogDescription>
-            <UsernameForm setOpen={setOpen} />
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <ChatLayout
+        chatId=""
+        chatOptions={chatOptions}
+        setChatOptions={setChatOptions}
+        messages={messages}
+        input={input}
+        handleInputChange={handleInputChange}
+        handleSubmit={onSubmit}
+        isLoading={isLoading}
+        error={error}
+        stop={stop}
+        navCollapsedSize={10}
+        defaultLayout={[30, 160]}
+      />
     </main>
   );
 }

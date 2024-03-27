@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { basePath, cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarImage } from "../ui/avatar";
 import { ChatProps } from "./chat";
 import Image from "next/image";
 import CodeDisplayBlock from "../code-display-block";
@@ -15,9 +15,6 @@ export default function ChatList({
   stop,
 }: ChatProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [name, setName] = React.useState<string>("");
-  const [localStorageIsLoading, setLocalStorageIsLoading] =
-    React.useState(true);
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -26,14 +23,6 @@ export default function ChatList({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  useEffect(() => {
-    const username = localStorage.getItem("ollama_user");
-    if (username) {
-      setName(username);
-      setLocalStorageIsLoading(false);
-    }
-  }, []);
 
   if (messages.length === 0) {
     return (
@@ -57,9 +46,9 @@ export default function ChatList({
   return (
     <div
       id="scroller"
-      className="w-full overflow-y-scroll overflow-x-hidden h-full justify-end"
+      className="w-[800px] overflow-y-scroll overflow-x-hidden h-full justify-center m-auto"
     >
-      <div className="w-full flex flex-col overflow-x-hidden overflow-y-hidden min-h-full justify-end">
+      <div className="flex flex-col overflow-x-hidden overflow-y-hidden min-h-full justify-end">
         {messages
           .filter((message) => message.role !== "system")
           .map((message, index) => (
@@ -67,32 +56,21 @@ export default function ChatList({
               key={index}
               className={cn(
                 "flex flex-col gap-2 p-4 whitespace-pre-wrap",
-                message.role === "user" ? "items-end" : "items-start"
+                message.role === "user" ? "items-start" : "items-start"
               )}
             >
               <div className="flex gap-3 items-center">
                 {message.role === "user" && (
-                  <div className="flex items-end gap-3">
-                    <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
+                  <div>
+                    <div className="font-semibold pb-2">You</div>
+                    <div className="bg-accent gap-1 p-2 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
                       {message.content}
-                    </span>
-                    <Avatar className="flex justify-start items-center overflow-hidden">
-                      <AvatarImage
-                        src="/"
-                        alt="user"
-                        width={6}
-                        height={6}
-                        className="object-contain"
-                      />
-                      <AvatarFallback>
-                        {name && name.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    </div>
                   </div>
                 )}
                 {message.role === "assistant" && (
                   <div className="flex items-end gap-2">
-                    <Avatar className="flex justify-start items-center">
+                    <Avatar className="flex justify-start items-center mt-0 mb-auto">
                       <AvatarImage
                         src={basePath + "/ollama.png"}
                         alt="AI"

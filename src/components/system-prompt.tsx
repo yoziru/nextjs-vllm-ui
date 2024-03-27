@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { MixIcon } from "@radix-ui/react-icons";
 import SystemPromptForm from "./system-prompt-form";
 import { ChatOptions } from "./chat/chat-options";
+import { Button } from "./ui/button";
 export interface SystemPromptProps {
   chatOptions: ChatOptions;
   setChatOptions: React.Dispatch<React.SetStateAction<ChatOptions>>;
@@ -11,13 +12,18 @@ export default function SystemPrompt({
   chatOptions,
   setChatOptions,
 }: SystemPromptProps) {
+  const [open, setOpen] = React.useState(false);
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="flex w-full gap-2 p-1 items-center cursor-pointer rounded-md border">
+        <Button
+          className="justify-start gap-2 w-full"
+          size="sm"
+          variant="ghost"
+        >
           <MixIcon className="w-4 h-4" />
           <p>System Prompt</p>
-        </div>
+        </Button>
       </DialogTrigger>
       <DialogContent className="space-y-2">
         <DialogTitle>Save system prompt</DialogTitle>

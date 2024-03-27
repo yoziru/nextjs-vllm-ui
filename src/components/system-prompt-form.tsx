@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import TextareaAutosize from "react-textarea-autosize";
 import { SystemPromptProps } from "./system-prompt";
+import { DialogClose } from "@radix-ui/react-dialog";
 const formSchema = z.object({
   name: z.string().min(1, {
     message: "Please set a system prompt",
@@ -66,7 +67,7 @@ export default function SystemPromptForm({
               <div>
                 <TextareaAutosize
                   {...field}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-xs"
                   autoComplete="off"
                   rows={3}
                   value={name}
@@ -80,11 +81,11 @@ export default function SystemPromptForm({
             </FormItem>
           )}
         />
-        <div className="space-y-2 w-full">
+        <DialogClose className="space-y-2 w-full">
           <Button type="submit" className="w-full">
             Save system prompt
           </Button>
-        </div>
+        </DialogClose>
       </form>
     </Form>
   );

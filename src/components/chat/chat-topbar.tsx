@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useEffect } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-import { Button } from "../ui/button";
-import { CaretSortIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
+import {
+  HamburgerMenuIcon,
+  CheckCircledIcon,
+  CrossCircledIcon,
+} from "@radix-ui/react-icons";
 import { Sidebar } from "../sidebar";
 import { Message } from "ai/react";
-import SystemPrompt from "../system-prompt";
 import { ChatOptions } from "./chat-options";
 import { basePath } from "@/lib/utils";
+import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 
 interface ChatTopbarProps {
   chatOptions: ChatOptions;
@@ -31,9 +30,11 @@ export default function ChatTopbar({
   chatId,
   messages,
 }: ChatTopbarProps) {
-  const [models, setModels] = React.useState<string[]>([]);
-  const [open, setOpen] = React.useState(false);
   const currentModel = chatOptions && chatOptions.selectedModel;
+
+  const handleModelChange = (model: string | undefined) => {
+    setChatOptions({ ...chatOptions, selectedModel: model });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,27 +47,22 @@ export default function ChatTopbar({
           },
         });
 
+        if (!res.ok) {
+          throw new Error(res.status + " " + res.statusText);
+        }
+
         const data = await res.json();
         // Extract the "name" field from each model object and store them in the state
         const modelNames = data.data.map((model: any) => model.id);
-        setModels(modelNames);
-
-        // if (!chatOptions || chatOptions.selectedModel === "") {
-        //   // save the first model in the list as selectedModel in localstorage
-        //   setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
-        // }
+        // save the first and only model in the list as selectedModel in localstorage
+        handleModelChange(modelNames[0]);
       } catch (error) {
-        // setChatOptions({ ...chatOptions, selectedModel: "Select model" });
-        setModels([]);
+        handleModelChange(undefined);
+        toast.error("Connection to vLLM server failed: " + error);
       }
     };
     fetchData();
-  }, [chatOptions, setChatOptions]);
-
-  const handleModelChange = (model: string) => {
-    setChatOptions({ ...chatOptions, selectedModel: model });
-    setOpen(false);
-  };
+  }, [chatOptions, setChatOptions, handleModelChange]);
 
   return (
     <div className="w-full flex px-4 py-6 items-center justify-between lg:justify-center">
@@ -80,49 +76,33 @@ export default function ChatTopbar({
             isCollapsed={false}
             isMobile={false}
             messages={messages}
+            chatOptions={chatOptions}
+            setChatOptions={setChatOptions}
           />
         </SheetContent>
       </Sheet>
 
       <div className="flex items-center gap-4">
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              disabled={isLoading}
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-full justify-between"
-            >
-              {currentModel || "Select model"}
-              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-1">
-            {models.length > 0 ? (
-              models.map((model) => (
-                <Button
-                  key={model}
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => {
-                    handleModelChange(model);
-                  }}
-                >
-                  {model}
-                </Button>
-              ))
-            ) : (
-              <Button variant="ghost" disabled className=" w-full">
-                No models available
-              </Button>
-            )}
-          </PopoverContent>
-        </Popover>
-        <SystemPrompt
-          chatOptions={chatOptions}
-          setChatOptions={setChatOptions}
-        />
+        <div className="w-full gap-1 flex justify-between items-center">
+          {currentModel !== undefined && (
+            <>
+              {isLoading ? (
+                <LoaderCircle className="w-4 h-4 text-blue-500" />
+              ) : (
+                <CheckCircledIcon className="w-4 h-4 text-green-500" />
+              )}
+              <span className="text-xs">
+                {isLoading ? "Generating.." : "Connected to vLLM server"}
+              </span>
+            </>
+          )}
+          {currentModel === undefined && (
+            <>
+              <CrossCircledIcon className="w-4 h-4 text-red-500" />
+              <span className="text-xs">Connection to vLLM server failed</span>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

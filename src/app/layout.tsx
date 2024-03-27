@@ -8,8 +8,8 @@ export const runtime = "edge"; // 'nodejs' (default) | 'edge'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ollama UI",
-  description: "Ollama chatbot web interface",
+  title: "vLLM UI",
+  description: "vLLM chatbot web interface",
 };
 
 export const viewport = {
