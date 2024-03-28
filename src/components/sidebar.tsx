@@ -1,14 +1,19 @@
 "use client";
+import { useEffect, useState } from "react";
+
+import { DialogClose } from "@radix-ui/react-dialog";
+import { Pencil2Icon, TrashIcon } from "@radix-ui/react-icons";
+import { Message } from "ai/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { TrashIcon, Pencil2Icon } from "@radix-ui/react-icons";
-import { cn } from "@/lib/utils";
+
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Message } from "ai/react";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import SidebarSkeleton from "./sidebar-skeleton";
+import { cn } from "@/lib/utils";
+import OllamaLogo from "../../public/ollama.png";
+import { ChatOptions } from "./chat/chat-options";
 import Settings from "./settings";
+import SidebarSkeleton from "./sidebar-skeleton";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +22,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-
-import { DialogClose } from "@radix-ui/react-dialog";
-import { ChatOptions } from "./chat/chat-options";
-import OllamaLogo from "../../public/ollama.png";
 
 interface SidebarProps {
   isCollapsed: boolean;

@@ -1,8 +1,8 @@
 "use client";
 
 import ClearChatsButton from "./settings-clear-chats";
-import SystemPrompt, { SystemPromptProps } from "./system-prompt";
 import SettingsThemeToggle from "./settings-theme-toggle";
+import SystemPrompt, { SystemPromptProps } from "./system-prompt";
 
 export default function Settings({
   chatOptions,

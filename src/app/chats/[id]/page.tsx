@@ -1,10 +1,12 @@
 "use client";
 
-import { ChatLayout } from "@/components/chat/chat-layout";
+import React from "react";
+
 import { ChatRequestOptions } from "ai";
 import { useChat } from "ai/react";
-import React from "react";
 import useLocalStorageState from "use-local-storage-state";
+
+import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatOptions } from "@/components/chat/chat-options";
 import { basePath } from "@/lib/utils";
 

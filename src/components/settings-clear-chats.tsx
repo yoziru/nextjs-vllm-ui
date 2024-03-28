@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "./ui/button";
-import { TrashIcon } from "@radix-ui/react-icons";
+
 import {
   Dialog,
   DialogClose,
@@ -10,9 +9,12 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@radix-ui/react-dialog";
-import { DialogHeader } from "./ui/dialog";
+import { TrashIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
+
 import { useHasMounted } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { DialogHeader } from "./ui/dialog";
 
 export default function ClearChatsButton() {
   const hasMounted = useHasMounted();

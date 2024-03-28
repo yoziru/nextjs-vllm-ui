@@ -1,10 +1,12 @@
 import React from "react";
-import ChatTopbar from "./chat-topbar";
-import ChatList from "./chat-list";
-import ChatBottombar from "./chat-bottombar";
-import { Message } from "ai/react";
+
 import { ChatRequestOptions } from "ai";
+import { Message } from "ai/react";
+
+import ChatBottombar from "./chat-bottombar";
+import ChatList from "./chat-list";
 import { ChatOptions } from "./chat-options";
+import ChatTopbar from "./chat-topbar";
 
 export interface ChatProps {
   chatId?: string;

@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
-import { ChatProps } from "./chat";
-import { Button } from "../ui/button";
-import TextareaAutosize from "react-textarea-autosize";
+
 import { PaperPlaneIcon, StopIcon } from "@radix-ui/react-icons";
+import TextareaAutosize from "react-textarea-autosize";
+
+import { Button } from "../ui/button";
+import { ChatProps } from "./chat";
 
 export default function ChatBottombar({
   messages,

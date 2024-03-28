@@ -1,26 +1,26 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 import {
-  HamburgerMenuIcon,
   CheckCircledIcon,
   CrossCircledIcon,
   DotFilledIcon,
-  InfoCircledIcon,
+  HamburgerMenuIcon,
 } from "@radix-ui/react-icons";
-import { Sidebar } from "../sidebar";
 import { Message } from "ai/react";
-import { ChatOptions } from "./chat-options";
-import { basePath, useHasMounted } from "@/lib/utils";
+import { toast } from "sonner";
+
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "sonner";
+import { basePath, useHasMounted } from "@/lib/utils";
+import { Sidebar } from "../sidebar";
+import { ChatOptions } from "./chat-options";
 
 interface ChatTopbarProps {
   chatOptions: ChatOptions;

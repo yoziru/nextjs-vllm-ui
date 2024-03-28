@@ -1,6 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useForm } from "react-hook-form";
+import TextareaAutosize from "react-textarea-autosize";
+import { toast } from "sonner";
+import { z } from "zod";
+
 import {
   Form,
   FormField,
@@ -8,14 +16,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "./ui/button";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import TextareaAutosize from "react-textarea-autosize";
 import { SystemPromptProps } from "./system-prompt";
-import { DialogClose } from "@radix-ui/react-dialog";
+import { Button } from "./ui/button";
+
 const formSchema = z.object({
   name: z.string(),
 });

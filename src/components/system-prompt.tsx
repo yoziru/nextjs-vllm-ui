@@ -1,9 +1,12 @@
 import React from "react";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
+
 import { MixIcon } from "@radix-ui/react-icons";
-import SystemPromptForm from "./system-prompt-form";
+
 import { ChatOptions } from "./chat/chat-options";
+import SystemPromptForm from "./system-prompt-form";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+
 export interface SystemPromptProps {
   chatOptions: ChatOptions;
   setChatOptions: React.Dispatch<React.SetStateAction<ChatOptions>>;

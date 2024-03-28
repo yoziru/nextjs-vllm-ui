@@ -1,10 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
+
+import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
-import { Button } from "./ui/button";
+
 import { useHasMounted } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 export default function SettingsThemeToggle() {
   const hasMounted = useHasMounted();

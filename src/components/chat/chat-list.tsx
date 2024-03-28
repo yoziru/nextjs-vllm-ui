@@ -1,9 +1,11 @@
-import React, { useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import React, { useEffect, useRef } from "react";
+
 import Image from "next/image";
-import { ChatProps } from "./chat";
-import CodeDisplayBlock from "../code-display-block";
+
+import { cn } from "@/lib/utils";
 import OllamaLogo from "../../../public/ollama.png";
+import CodeDisplayBlock from "../code-display-block";
+import { ChatProps } from "./chat";
 
 export default function ChatList({
   messages,

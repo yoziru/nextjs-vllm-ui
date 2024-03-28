@@ -1,14 +1,16 @@
 "use client";
 
-import { ChatLayout } from "@/components/chat/chat-layout";
+import React from "react";
+
 import { ChatRequestOptions } from "ai";
 import { useChat } from "ai/react";
-import React from "react";
-import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 import useLocalStorageState from "use-local-storage-state";
+import { v4 as uuidv4 } from "uuid";
+
+import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatOptions } from "@/components/chat/chat-options";
 import { basePath } from "@/lib/utils";
-import { toast } from "sonner";
 
 export default function Home() {
   const {

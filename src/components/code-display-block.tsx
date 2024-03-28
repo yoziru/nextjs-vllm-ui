@@ -1,10 +1,12 @@
 "use client";
-import { CheckIcon, CopyIcon } from "@radix-ui/react-icons";
 import React from "react";
-import { CodeBlock, dracula, github } from "react-code-blocks";
-import { Button } from "./ui/button";
-import { toast } from "sonner";
+
+import { CheckIcon, CopyIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
+import { CodeBlock, dracula, github } from "react-code-blocks";
+import { toast } from "sonner";
+
+import { Button } from "./ui/button";
 
 interface ButtonCodeblockProps {
   code: string;

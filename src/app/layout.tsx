@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
-import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
+import type { Metadata } from "next";
+
 import { Toaster } from "@/components/ui/sonner";
+import "./globals.css";
+
 export const runtime = "edge"; // 'nodejs' (default) | 'edge'
 
 export const metadata: Metadata = {
