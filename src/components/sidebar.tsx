@@ -20,7 +20,6 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog";
 import { ChatOptions } from "./chat/chat-options";
 
-
 interface SidebarProps {
   isCollapsed: boolean;
   messages: Message[];
@@ -154,13 +153,15 @@ export function Sidebar({
         >
           <div className="flex gap-3 items-center">
             {!isCollapsed && !isMobile && (
-              <img
-                src={basePath + "/ollama.png"}
-                alt="AI"
-                width={28}
-                height={28}
-                className="dark:invert hidden 2xl:block"
-              />
+              <picture>
+                <img
+                  src={basePath + "/ollama.png"}
+                  alt="AI"
+                  width={28}
+                  height={28}
+                  className="dark:invert hidden 2xl:block"
+                />
+              </picture>
             )}
             New chat
           </div>
@@ -178,7 +179,10 @@ export function Sidebar({
                 </p>
                 <ol>
                   {localChats[group].map(({ chatId, messages }, chatIndex) => (
-                    <li className="flex w-full gap-0 items-center relative" key={chatIndex}>
+                    <li
+                      className="flex w-full gap-0 items-center relative"
+                      key={chatIndex}
+                    >
                       <div className="flex-col w-full truncate">
                         <Link
                           href={`/chats/${chatId.substring(5)}`}
