@@ -4,6 +4,7 @@ import React from "react";
 
 import { ChatRequestOptions } from "ai";
 import { useChat } from "ai/react";
+import { toast } from "sonner";
 import useLocalStorageState from "use-local-storage-state";
 
 import { ChatLayout } from "@/components/chat/chat-layout";
@@ -20,7 +21,12 @@ export default function Page({ params }: { params: { id: string } }) {
     error,
     stop,
     setMessages,
-  } = useChat({ api: basePath + "/api/chat" });
+  } = useChat({
+    api: basePath + "/api/chat",
+    onError: (error) => {
+      toast.error("Something went wrong: " + error);
+    },
+  });
   const [chatId, setChatId] = React.useState<string>("");
   const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
     "chatOptions",
