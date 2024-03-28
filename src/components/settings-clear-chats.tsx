@@ -12,21 +12,26 @@ import {
 } from "@radix-ui/react-dialog";
 import { DialogHeader } from "./ui/dialog";
 import { useRouter } from "next/navigation";
+import { useHasMounted } from "@/lib/utils";
 
 export default function ClearChatsButton() {
-  const chats = Object.keys(localStorage).filter((key) =>
-    key.startsWith("chat_")
-  );
+  const hasMounted = useHasMounted();
+  const router = useRouter();
+
+  if (!hasMounted) {
+    return null;
+  }
+
+  const chats = Object.keys(localStorage).filter((key) => key.startsWith("chat_"));
 
   const disabled = chats.length === 0;
-  const router = useRouter();
 
   const clearChats = () => {
     chats.forEach((key) => {
       localStorage.removeItem(key);
     });
     window.dispatchEvent(new Event("storage"));
-    router.push("/")
+    router.push("/");
   };
 
   return (
@@ -52,7 +57,11 @@ export default function ClearChatsButton() {
             <Button variant="outline" size="sm">
               <DialogClose>Cancel</DialogClose>
             </Button>
-            <Button variant="destructive" size="sm" onClick={() => clearChats()}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => clearChats()}
+            >
               <DialogClose>Delete</DialogClose>
             </Button>
           </div>

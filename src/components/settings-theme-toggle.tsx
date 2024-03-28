@@ -4,9 +4,16 @@ import * as React from "react";
 import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
+import { useHasMounted } from "@/lib/utils";
 
 export default function SettingsThemeToggle() {
+  const hasMounted = useHasMounted();
   const { setTheme, theme } = useTheme();
+
+  if (!hasMounted) {
+    return null;
+  }
+
   const nextTheme = theme === "light" ? "dark" : "light";
 
   return (

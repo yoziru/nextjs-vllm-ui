@@ -1,12 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import ClearChatsButton from "./settings-clear-chats";
 import SystemPrompt, { SystemPromptProps } from "./system-prompt";
-
-const SettingsThemeToggle = dynamic(() => import("./settings-theme-toggle"), {
-  ssr: false,
-});
+import SettingsThemeToggle from "./settings-theme-toggle";
 
 export default function Settings({
   chatOptions,
