@@ -8,7 +8,12 @@ import TextareaAutosize from "react-textarea-autosize";
 import { Button } from "../ui/button";
 import { ChatProps } from "./chat";
 
+interface ChatBottombarProps extends ChatProps {
+  selectedModel: string | undefined;
+}
+
 export default function ChatBottombar({
+  selectedModel,
   messages,
   input,
   handleInputChange,
@@ -16,30 +21,12 @@ export default function ChatBottombar({
   isLoading,
   error,
   stop,
-}: ChatProps) {
-  const [message, setMessage] = React.useState(input);
-  const [isMobile, setIsMobile] = React.useState(false);
+}: ChatBottombarProps) {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
-
-  React.useEffect(() => {
-    const checkScreenWidth = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    // Initial check
-    checkScreenWidth();
-
-    // Event listener for screen width changes
-    window.addEventListener("resize", checkScreenWidth);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      window.removeEventListener("resize", checkScreenWidth);
-    };
-  }, []);
+  const hasSelectedModel = selectedModel && selectedModel !== "";
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && hasSelectedModel && !isLoading) {
       e.preventDefault();
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
@@ -68,7 +55,7 @@ export default function ChatBottombar({
               variant="secondary"
               size="icon"
               type="submit"
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || !input.trim() || !hasSelectedModel}
             >
               <PaperPlaneIcon className=" w-6 h-6 text-muted-foreground" />
             </Button>

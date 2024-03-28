@@ -60,6 +60,7 @@ export default function Chat({
       />
 
       <ChatBottombar
+        selectedModel={chatOptions.selectedModel}
         messages={messages}
         input={input}
         handleInputChange={handleInputChange}
