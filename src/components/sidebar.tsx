@@ -5,7 +5,6 @@ import { SquarePen, Trash2 } from "lucide-react";
 import { basePath, cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Message } from "ai/react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import SidebarSkeleton from "./sidebar-skeleton";
 import Settings from "./settings";
@@ -20,6 +19,7 @@ import {
 
 import { DialogClose } from "@radix-ui/react-dialog";
 import { ChatOptions } from "./chat/chat-options";
+
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -154,7 +154,7 @@ export function Sidebar({
         >
           <div className="flex gap-3 items-center">
             {!isCollapsed && !isMobile && (
-              <Image
+              <img
                 src={basePath + "/ollama.png"}
                 alt="AI"
                 width={28}

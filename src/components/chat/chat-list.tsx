@@ -1,8 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { basePath, cn } from "@/lib/utils";
-import { Avatar, AvatarImage } from "../ui/avatar";
 import { ChatProps } from "./chat";
-import Image from "next/image";
 import CodeDisplayBlock from "../code-display-block";
 
 export default function ChatList({
@@ -28,8 +26,8 @@ export default function ChatList({
     return (
       <div className="w-full h-full flex justify-center items-center">
         <div className="flex flex-col gap-4 items-center">
-          <Image
-            src={basePath + "/ollama.png"}
+          <img
+            src={basePath  + "/ollama.png"}
             alt="AI"
             width={60}
             height={60}
@@ -70,15 +68,13 @@ export default function ChatList({
                 )}
                 {message.role === "assistant" && (
                   <div className="flex items-end gap-2">
-                    <Avatar className="flex justify-start items-center mt-0 mb-auto">
-                      <AvatarImage
+                    <div className="flex justify-start items-center mt-0 mb-auto relative h-10 w-10 shrink-0 overflow-hidden">
+                      <img
                         src={basePath + "/ollama.png"}
                         alt="AI"
-                        width={6}
-                        height={6}
-                        className="object-contain dark:invert"
+                        className="object-contain dark:invert aspect-square h-full w-full"
                       />
-                    </Avatar>
+                    </div>
                     <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
                       {/* Check if the message content contains a code block */}
                       {message.content.split("```").map((part, index) => {
