@@ -60,7 +60,7 @@ const formatMessages = (messages: Message[]): Message[] => {
   });
 };
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { messages, chatOptions } = await req.json();
     if (!chatOptions.selectedModel || chatOptions.selectedModel === "") {
@@ -102,7 +102,7 @@ const getOpenAIStream = async (
   messages: Message[],
   temperature?: number,
   apiKey?: string
-) => {
+): Promise<ReadableStream<Uint8Array>> => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   const headers = new Headers();

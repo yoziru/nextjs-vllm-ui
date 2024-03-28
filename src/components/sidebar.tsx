@@ -173,8 +173,8 @@ export function Sidebar({
         {Object.keys(localChats).length > 0 && (
           <div>
             {Object.keys(localChats).map((group, index) => (
-              <div key={index} className="flex flex-col gap-2">
-                <p className="h-9 pb-4 pt-8 px-2 text-xs font-medium text-muted-foreground">
+              <div key={index} className="flex flex-col gap-2 pb-8">
+                <p className="px-2 text-xs font-medium text-muted-foreground">
                   {group}
                 </p>
                 <ol>

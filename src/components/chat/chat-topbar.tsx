@@ -11,7 +11,7 @@ import {
 import { Sidebar } from "../sidebar";
 import { Message } from "ai/react";
 import { ChatOptions } from "./chat-options";
-import { basePath } from "@/lib/utils";
+import { basePath, useHasMounted } from "@/lib/utils";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,6 +30,8 @@ export default function ChatTopbar({
   chatId,
   messages,
 }: ChatTopbarProps) {
+  const hasMounted = useHasMounted();
+
   const currentModel = chatOptions && chatOptions.selectedModel;
 
   const fetchData = async () => {
@@ -43,7 +45,10 @@ export default function ChatTopbar({
       });
 
       if (!res.ok) {
-        throw new Error(res.status + " " + res.statusText);
+        const errorResponse = await res.json();
+        const errorMessage = `Connection to vLLM server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
       }
 
       const data = await res.json();
@@ -53,13 +58,23 @@ export default function ChatTopbar({
       setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
     } catch (error) {
       setChatOptions({ ...chatOptions, selectedModel: undefined });
-      toast.error("Connection to vLLM server failed: " + error);
+      console.log(error);
     }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  if (!hasMounted) {
+    return (
+      <div className="w-full flex px-4 py-6 items-center gap-1 lg:justify-center">
+      <LoaderCircle className="w-4 h-4 text-blue-500" />
+              <span className="text-xs">
+        Booting up..</span>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full flex px-4 py-6 items-center justify-between lg:justify-center">
