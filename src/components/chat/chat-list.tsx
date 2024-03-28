@@ -26,15 +26,13 @@ export default function ChatList({
     return (
       <div className="w-full h-full flex justify-center items-center">
         <div className="flex flex-col gap-4 items-center">
-          <picture>
-            <img
-              src={basePath + "/ollama.png"}
-              alt="AI"
-              width={60}
-              height={60}
-              className="h-20 w-14 object-contain dark:invert"
-            />
-          </picture>
+          <img
+            src={basePath  + "/ollama.png"}
+            alt="AI"
+            width={60}
+            height={60}
+            className="h-20 w-14 object-contain dark:invert"
+          />
           <p className="text-center text-lg text-muted-foreground">
             How can I help you today?
           </p>
@@ -71,13 +69,11 @@ export default function ChatList({
                 {message.role === "assistant" && (
                   <div className="flex items-end gap-2">
                     <div className="flex justify-start items-center mt-0 mb-auto relative h-10 w-10 shrink-0 overflow-hidden">
-                      <picture>
-                        <img
-                          src={basePath + "/ollama.png"}
-                          alt="AI"
-                          className="object-contain dark:invert aspect-square h-full w-full"
-                        />
-                      </picture>
+                      <img
+                        src={basePath + "/ollama.png"}
+                        alt="AI"
+                        className="object-contain dark:invert aspect-square h-full w-full"
+                      />
                     </div>
                     <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
                       {/* Check if the message content contains a code block */}
