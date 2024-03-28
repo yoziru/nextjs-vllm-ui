@@ -42,6 +42,9 @@ export default function ChatTopbar({
   const currentModel = chatOptions && chatOptions.selectedModel;
 
   const fetchData = async () => {
+    if (!hasMounted) {
+      return null;
+    }
     try {
       const res = await fetch(basePath + "/api/models", {
         method: "GET",
@@ -71,7 +74,7 @@ export default function ChatTopbar({
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [hasMounted]);
 
   if (!hasMounted) {
     return (
