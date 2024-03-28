@@ -3,7 +3,9 @@ node_modules/
 .env
 next-env.d.ts
 Dockerfile
+docker-compose.yml
 .dockerignore
 Makefile
 .github
 .git
+nginx.conf

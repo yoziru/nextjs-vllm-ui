@@ -1,0 +1,19 @@
+version: "3"
+services:
+  nextjs-vllm-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      VLLM_URL: http://host.docker.internal:8000
+    ports:
+      - 3000:3000
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 3001:3001
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - nextjs-vllm-ui
