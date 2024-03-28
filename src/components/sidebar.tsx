@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SquarePen, Trash2 } from "lucide-react";
+import { TrashIcon, Pencil2Icon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Message } from "ai/react";
@@ -165,7 +165,7 @@ export function Sidebar({
             )}
             New chat
           </div>
-          <SquarePen size={18} className="shrink-0 w-4 h-4" />
+          <Pencil2Icon className="shrink-0 w-4 h-4" />
         </Button>
       </div>
 
@@ -209,7 +209,7 @@ export function Sidebar({
                               variant="ghost"
                               className="hover:text-red-500"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <TrashIcon className="w-4 h-4" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent>

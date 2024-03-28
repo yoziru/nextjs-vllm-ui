@@ -7,12 +7,19 @@ import {
   HamburgerMenuIcon,
   CheckCircledIcon,
   CrossCircledIcon,
+  DotFilledIcon,
+  InfoCircledIcon,
 } from "@radix-ui/react-icons";
 import { Sidebar } from "../sidebar";
 import { Message } from "ai/react";
 import { ChatOptions } from "./chat-options";
 import { basePath, useHasMounted } from "@/lib/utils";
-import { LoaderCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 interface ChatTopbarProps {
@@ -69,9 +76,8 @@ export default function ChatTopbar({
   if (!hasMounted) {
     return (
       <div className="w-full flex px-4 py-6 items-center gap-1 lg:justify-center">
-      <LoaderCircle className="w-4 h-4 text-blue-500" />
-              <span className="text-xs">
-        Booting up..</span>
+        <DotFilledIcon className="w-4 h-4 text-blue-500" />
+        <span className="text-xs">Booting up..</span>
       </div>
     );
   }
@@ -99,12 +105,27 @@ export default function ChatTopbar({
           {currentModel !== undefined && (
             <>
               {isLoading ? (
-                <LoaderCircle className="w-4 h-4 text-blue-500" />
+                <DotFilledIcon className="w-4 h-4 text-blue-500" />
               ) : (
-                <CheckCircledIcon className="w-4 h-4 text-green-500" />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span className="cursor-help">
+                        <CheckCircledIcon className="w-4 h-4 text-green-500" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      sideOffset={4}
+                      className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-2 rounded-xs text-xs"
+                    >
+                      <p className="font-bold">Current Model</p>
+                      <p className="text-gray-500">{currentModel}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               <span className="text-xs">
-                {isLoading ? "Generating.." : "Connected to vLLM server"}
+                {isLoading ? "Generating.." : "Ready"}
               </span>
             </>
           )}
