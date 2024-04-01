@@ -42,14 +42,14 @@ const SidebarTabs = ({
   setChatOptions,
   handleDeleteChat,
 }: SidebarTabsProps) => (
-  <Tabs.Root className="TabsRoot" defaultValue="chats">
-    <div className="flex-1 flex-col gap-2 text-sm m-2 h-full overflow-y-auto">
-      <Tabs.Content className="TabsContent" value="chats">
-        <>
+  <Tabs.Root className="overflow-hidden h-full" defaultValue="chats">
+    <div className=" text-sm o h-full">
+      <Tabs.Content className="h-full ml-2 mt-0 mb-16" value="chats">
+        <div className="h-full overflow-y-auto">
           {Object.keys(localChats).length > 0 && (
-            <div>
+            <>
               {Object.keys(localChats).map((group, index) => (
-                <div key={index} className="flex flex-col gap-2 pb-8">
+                <div key={index} className="flex flex-col gap-2 mb-8">
                   <p className="px-2 text-xs font-medium text-muted-foreground">
                     {group}
                   </p>
@@ -118,16 +118,16 @@ const SidebarTabs = ({
                   </ol>
                 </div>
               ))}
-            </div>
+            </>
           )}
           {isLoading && <SidebarSkeleton />}
-        </>
+        </div>
       </Tabs.Content>
-      <Tabs.Content className="TabsContent" value="settings">
+      <Tabs.Content className="m-2 align-bottom overflow-y-auto" value="settings">
         <Settings chatOptions={chatOptions} setChatOptions={setChatOptions} />
       </Tabs.Content>
     </div>
-    <div className="sticky left-0 right-0 bottom-0 z-20 py-2 m-0 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-card">
+    <div className="sticky left-0 right-0 bottom-0 z-20 py-2 m-0 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-card  overflow-hidden">
       <Tabs.List
         className="flex flex-wrap -mb-px text-sm font-medium text-center justify-center gap-2"
         aria-label="Navigation"

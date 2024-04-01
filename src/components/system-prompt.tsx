@@ -43,7 +43,7 @@ export default function SystemPrompt({
         <Textarea
           className="resize-none"
           autoComplete="off"
-          rows={5}
+          rows={7}
           value={text}
           onChange={(e) => setText(e.currentTarget.value)}
           name="systemPrompt"
