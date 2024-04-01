@@ -23,7 +23,6 @@ FROM node:$NODE_VERSION-alpine AS runner
 WORKDIR /opt/app
 
 ENV NODE_ENV production
-ENV NEXT_SHARP_PATH=/tmp/node_modules/sharp
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
@@ -35,7 +34,6 @@ COPY --from=builder /opt/app/public ./public
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-COPY --from=builder --chown=nextjs:nodejs --link /opt/app/node_modules/sharp /tmp/node_modules/sharp
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/standalone ./
