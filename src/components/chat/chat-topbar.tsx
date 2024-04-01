@@ -119,7 +119,7 @@ export default function ChatTopbar({
                     </TooltipTrigger>
                     <TooltipContent
                       sideOffset={4}
-                      className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-2 rounded-xs text-xs"
+                      className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-2 rounded-sm text-xs"
                     >
                       <p className="font-bold">Current Model</p>
                       <p className="text-gray-500">{currentModel}</p>

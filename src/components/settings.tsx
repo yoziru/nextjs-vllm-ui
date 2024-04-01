@@ -12,7 +12,6 @@ export default function Settings({
     <>
       <SettingsThemeToggle />
       <ClearChatsButton />
-
       <SystemPrompt chatOptions={chatOptions} setChatOptions={setChatOptions} />
     </>
   );

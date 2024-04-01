@@ -98,7 +98,6 @@ export function ChatLayout({
           setChatOptions={setChatOptions}
         />
       </ResizablePanel>
-      <ResizableHandle className={cn("hidden md:flex")} withHandle />
       <ResizablePanel className="h-full" defaultSize={defaultLayout[1]}>
         <Chat
           chatId={chatId}
