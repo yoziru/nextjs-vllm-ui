@@ -1,39 +1,55 @@
-import React from "react";
+"use client";
 
-import { MixIcon } from "@radix-ui/react-icons";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
+import { toast } from "sonner";
+import { useDebounce } from "use-debounce";
+
+import { useHasMounted } from "@/lib/utils";
 import { ChatOptions } from "./chat/chat-options";
-import SystemPromptForm from "./system-prompt-form";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Textarea } from "./ui/textarea";
 
 export interface SystemPromptProps {
   chatOptions: ChatOptions;
-  setChatOptions: React.Dispatch<React.SetStateAction<ChatOptions>>;
+  setChatOptions: Dispatch<SetStateAction<ChatOptions>>;
 }
 export default function SystemPrompt({
   chatOptions,
   setChatOptions,
 }: SystemPromptProps) {
-  const [open, setOpen] = React.useState(false);
+  const hasMounted = useHasMounted();
+
+  const systemPrompt = chatOptions ? chatOptions.systemPrompt : "";
+  const [text, setText] = useState<string>(systemPrompt || "");
+  const [debouncedText] = useDebounce(text, 500);
+
+  useEffect(() => {
+    if (!hasMounted) {
+      return;
+    }
+    if (debouncedText !== systemPrompt) {
+      setChatOptions({ ...chatOptions, systemPrompt: debouncedText });
+      toast.success("System prompt updated", { duration: 1000 });
+    }
+  }, [hasMounted, debouncedText]);
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          className="justify-start gap-2 w-full"
-          size="sm"
-          variant="ghost"
-        >
-          <MixIcon className="w-4 h-4" />
-          <p>System Prompt</p>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="space-y-2">
-        <SystemPromptForm
-          chatOptions={chatOptions}
-          setChatOptions={setChatOptions}
+    <div>
+      <div className="justify-start gap-2 w-full rounded-sm px-2 text-xs">
+        <p>System prompt</p>
+      </div>
+
+      <div className="m-2">
+        <Textarea
+          className="resize-none"
+          autoComplete="off"
+          rows={5}
+          value={text}
+          onChange={(e) => setText(e.currentTarget.value)}
+          name="systemPrompt"
+          placeholder="You are a helpful assistant."
         />
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

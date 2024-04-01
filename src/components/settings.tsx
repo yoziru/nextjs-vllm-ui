@@ -10,9 +10,9 @@ export default function Settings({
 }: SystemPromptProps) {
   return (
     <>
+      <SystemPrompt chatOptions={chatOptions} setChatOptions={setChatOptions} />
       <SettingsThemeToggle />
       <ClearChatsButton />
-      <SystemPrompt chatOptions={chatOptions} setChatOptions={setChatOptions} />
     </>
   );
 }
