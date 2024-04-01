@@ -96,7 +96,3 @@ npm run dev
 [shadcn-ui](https://ui.shadcn.com/) - UI component built using Radix UI and Tailwind CSS
 
 [shadcn-chat](https://github.com/jakobhoeg/shadcn-chat) - Chat components for NextJS/React projects
-
-[Framer Motion](https://www.framer.com/motion/) - Motion/animation library for React
-
-[Lucide Icons](https://lucide.dev/) - Icon library
