@@ -28,7 +28,7 @@ interface Chats {
 interface SidebarTabsProps {
   isLoading: boolean;
   localChats: Chats;
-  selectedChatId: string | null;
+  selectedChatId: string;
   chatOptions: ChatOptions;
   setChatOptions: React.Dispatch<React.SetStateAction<ChatOptions>>;
   handleDeleteChat: (chatId: string) => void;

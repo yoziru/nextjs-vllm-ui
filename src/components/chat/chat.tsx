@@ -10,6 +10,7 @@ import ChatTopbar from "./chat-topbar";
 
 export interface ChatProps {
   chatId?: string;
+  setChatId: React.Dispatch<React.SetStateAction<string>>;
   messages: Message[];
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -38,6 +39,7 @@ export default function Chat({
   chatOptions,
   setChatOptions,
   chatId,
+  setChatId,
 }: ChatProps & ChatTopbarProps) {
   return (
     <div className="flex flex-col justify-between w-full h-full  ">
@@ -46,27 +48,21 @@ export default function Chat({
         setChatOptions={setChatOptions}
         isLoading={isLoading}
         chatId={chatId}
+        setChatId={setChatId}
         messages={messages}
       />
 
       <ChatList
         messages={messages}
-        input={input}
-        handleInputChange={handleInputChange}
-        handleSubmit={handleSubmit}
         isLoading={isLoading}
-        error={error}
-        stop={stop}
       />
 
       <ChatBottombar
         selectedModel={chatOptions.selectedModel}
-        messages={messages}
         input={input}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         isLoading={isLoading}
-        error={error}
         stop={stop}
       />
     </div>

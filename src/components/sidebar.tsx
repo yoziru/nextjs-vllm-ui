@@ -4,19 +4,19 @@ import { useEffect, useState } from "react";
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Message } from "ai/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import OllamaLogo from "../../public/ollama.png";
 import { ChatOptions } from "./chat/chat-options";
 import SidebarTabs from "./sidebar-tabs";
-
+import { RedirectType, redirect } from "next/navigation";
+import Link from "next/link";
 interface SidebarProps {
   isCollapsed: boolean;
-  messages: Message[];
   onClick?: () => void;
   isMobile: boolean;
   chatId: string;
+  setChatId: React.Dispatch<React.SetStateAction<string>>;
   chatOptions: ChatOptions;
   setChatOptions: React.Dispatch<React.SetStateAction<ChatOptions>>;
 }
@@ -26,23 +26,17 @@ interface Chats {
 }
 
 export function Sidebar({
-  messages,
   isCollapsed,
   isMobile,
   chatId,
+  setChatId,
   chatOptions,
   setChatOptions,
 }: SidebarProps) {
   const [localChats, setLocalChats] = useState<Chats>({});
-  const router = useRouter();
-  const [selectedChatId, setSselectedChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (chatId) {
-      setSselectedChatId(chatId);
-    }
-
     setLocalChats(getLocalstorageChats());
     const handleStorageChange = () => {
       setLocalChats(getLocalstorageChats());
@@ -118,7 +112,6 @@ export function Sidebar({
     const groupedChats = groupChatsByDate(chatObjects);
 
     return groupedChats;
-    // return chatObjects;
   };
 
   const handleDeleteChat = (chatId: string) => {
@@ -132,12 +125,10 @@ export function Sidebar({
       className="relative justify-between group lg:bg- accent/20 lg:dark:bg-card/35 flex flex-col h-full gap-4 data-[collapsed=true]:p-0"
     >
       <div className="sticky left-0 right-0 top-0 z-20 p-1 rounded-sm m-2">
-        <Button
-          onClick={() => {
-            router.push("/new");
-          }}
-          variant="outline"
+        <Link
           className="flex justify-between w-full h-10 text-sm font-medium items-center"
+          href="/"
+          onClick={() => {setChatId("");}}
         >
           <div className="flex gap-3 items-center">
             {!isCollapsed && !isMobile && (
@@ -152,12 +143,12 @@ export function Sidebar({
             New chat
           </div>
           <Pencil2Icon className="shrink-0 w-4 h-4" />
-        </Button>
+        </Link>
       </div>
       <SidebarTabs
         isLoading={isLoading}
         localChats={localChats}
-        selectedChatId={selectedChatId}
+        selectedChatId={chatId}
         chatOptions={chatOptions}
         setChatOptions={setChatOptions}
         handleDeleteChat={handleDeleteChat}

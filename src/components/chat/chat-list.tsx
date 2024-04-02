@@ -5,17 +5,14 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import OllamaLogo from "../../../public/ollama.png";
 import CodeDisplayBlock from "../code-display-block";
-import { ChatProps } from "./chat";
+import { Message } from "ai";
 
-export default function ChatList({
-  messages,
-  input,
-  handleInputChange,
-  handleSubmit,
-  isLoading,
-  error,
-  stop,
-}: ChatProps) {
+interface ChatListProps {
+  messages: Message[];
+  isLoading: boolean;
+}
+
+export default function ChatList({ messages, isLoading }: ChatListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {

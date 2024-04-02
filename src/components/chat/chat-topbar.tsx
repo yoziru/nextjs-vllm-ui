@@ -27,6 +27,7 @@ interface ChatTopbarProps {
   setChatOptions: React.Dispatch<React.SetStateAction<ChatOptions>>;
   isLoading: boolean;
   chatId?: string;
+  setChatId: React.Dispatch<React.SetStateAction<string>>;
   messages: Message[];
 }
 
@@ -35,6 +36,7 @@ export default function ChatTopbar({
   setChatOptions,
   isLoading,
   chatId,
+  setChatId,
   messages,
 }: ChatTopbarProps) {
   const hasMounted = useHasMounted();
@@ -94,9 +96,9 @@ export default function ChatTopbar({
         <SheetContent side="left">
           <Sidebar
             chatId={chatId || ""}
+            setChatId={setChatId}
             isCollapsed={false}
             isMobile={false}
-            messages={messages}
             chatOptions={chatOptions}
             setChatOptions={setChatOptions}
           />

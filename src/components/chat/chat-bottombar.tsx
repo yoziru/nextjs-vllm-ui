@@ -3,23 +3,29 @@
 import React from "react";
 
 import { PaperPlaneIcon, StopIcon } from "@radix-ui/react-icons";
+import { ChatRequestOptions } from "ai";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { Button } from "../ui/button";
-import { ChatProps } from "./chat";
 
-interface ChatBottombarProps extends ChatProps {
+interface ChatBottombarProps {
   selectedModel: string | undefined;
+  input: string;
+  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleSubmit: (
+    e: React.FormEvent<HTMLFormElement>,
+    chatRequestOptions?: ChatRequestOptions
+  ) => void;
+  isLoading: boolean;
+  stop: () => void;
 }
 
 export default function ChatBottombar({
   selectedModel,
-  messages,
   input,
   handleInputChange,
   handleSubmit,
   isLoading,
-  error,
   stop,
 }: ChatBottombarProps) {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);

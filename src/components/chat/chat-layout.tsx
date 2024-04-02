@@ -32,6 +32,7 @@ export function ChatLayout({
   error,
   stop,
   chatId,
+  setChatId,
   chatOptions,
   setChatOptions,
 }: MergedProps) {
@@ -91,9 +92,9 @@ export function ChatLayout({
       >
         <Sidebar
           isCollapsed={isCollapsed || isMobile}
-          messages={messages}
           isMobile={isMobile}
           chatId={chatId}
+          setChatId={setChatId}
           chatOptions={chatOptions}
           setChatOptions={setChatOptions}
         />
@@ -101,6 +102,7 @@ export function ChatLayout({
       <ResizablePanel className="h-full" defaultSize={defaultLayout[1]}>
         <Chat
           chatId={chatId}
+          setChatId={setChatId}
           chatOptions={chatOptions}
           setChatOptions={setChatOptions}
           messages={messages}
