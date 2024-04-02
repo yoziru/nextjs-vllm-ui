@@ -4,13 +4,11 @@ import {
   ReconnectInterval,
 } from "eventsource-parser";
 import { NextRequest, NextResponse } from "next/server";
+import { ChatCompletionAssistantMessageParam, ChatCompletionCreateParamsStreaming, ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
 
-export interface Message {
-  role: "user" | "assistant" | "system";
-  content: string;
-}
 
-const addSystemMessage = (messages: Message[], systemPrompt?: string) => {
+
+const addSystemMessage = (messages: ChatCompletionMessageParam[], systemPrompt?: string) => {
   // early exit if system prompt is empty
   if (!systemPrompt || systemPrompt === "") {
     return messages;
@@ -24,7 +22,7 @@ const addSystemMessage = (messages: Message[], systemPrompt?: string) => {
       {
         content: systemPrompt,
         role: "system",
-      },
+      } ,
     ];
   } else if (messages.length === 0) {
     // if there are no messages, add the system prompt as the first message
@@ -48,14 +46,14 @@ const addSystemMessage = (messages: Message[], systemPrompt?: string) => {
   return messages;
 };
 
-const formatMessages = (messages: Message[]): Message[] => {
+const formatMessages = (messages: ChatCompletionMessageParam[]): ChatCompletionMessageParam[] => {
   return messages.map((m) => {
     if (m.role === "system") {
-      return { role: "system", content: m.content } as Message;
+      return { role: "system", content: m.content } as ChatCompletionSystemMessageParam;
     } else if (m.role === "user") {
-      return { role: "user", content: m.content } as Message;
+      return { role: "user", content: m.content } as ChatCompletionUserMessageParam;
     } else {
-      return { role: "assistant", content: m.content } as Message;
+      return { role: "assistant", content: m.content } as ChatCompletionAssistantMessageParam;
     }
   });
 };
@@ -99,7 +97,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 const getOpenAIStream = async (
   apiUrl: string,
   model: string,
-  messages: Message[],
+  messages: ChatCompletionMessageParam[],
   temperature?: number,
   apiKey?: string
 ): Promise<ReadableStream<Uint8Array>> => {
@@ -111,19 +109,23 @@ const getOpenAIStream = async (
     headers.set("Authorization", `Bearer ${apiKey}`);
     headers.set("api-key", apiKey);
   }
+  const chatOptions: ChatCompletionCreateParamsStreaming = {
+    model: model,
+    // frequency_penalty: 0,
+    // max_tokens: 2000,
+    messages: messages,
+    // presence_penalty: 0,
+    stream: true,
+    temperature: temperature ?? 0.5,
+    // response_format: {
+    //   type: "json_object",
+    // }
+    // top_p: 0.95,
+  }
   const res = await fetch(apiUrl + "/v1/chat/completions",{
     headers: headers,
     method: "POST",
-    body: JSON.stringify({
-      model: model,
-      // frequency_penalty: 0,
-      // max_tokens: 2000,
-      messages: messages,
-      // presence_penalty: 0,
-      stream: true,
-      temperature: temperature ?? 0.5,
-      // top_p: 0.95,
-    }),
+    body: JSON.stringify(chatOptions),
   });
 
   if (res.status !== 200) {
