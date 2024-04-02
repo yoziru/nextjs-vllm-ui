@@ -8,7 +8,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { Message } from "ai/react";
 import Link from "next/link";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChatOptions } from "./chat/chat-options";
 import Settings from "./settings";
@@ -81,14 +81,8 @@ const SidebarTabs = ({
                           </div>
                           <div className="flex-col">
                             <Dialog>
-                              <DialogTrigger>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="hover:text-red-500"
-                                >
-                                  <TrashIcon className="w-4 h-4" />
-                                </Button>
+                              <DialogTrigger className="inline-flex items-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent  h-8 rounded-sm px-3 text-xs justify-start gap-2 w-full hover:text-red-500">
+                                <TrashIcon className="w-4 h-4" />
                               </DialogTrigger>
                               <DialogContent>
                                 <DialogHeader className="space-y-4">
@@ -98,15 +92,16 @@ const SidebarTabs = ({
                                     This action cannot be undone.
                                   </DialogDescription>
                                   <div className="flex justify-end gap-2">
-                                    <Button variant="outline">
-                                      <DialogClose>Cancel</DialogClose>
-                                    </Button>
-                                    <Button
-                                      variant="destructive"
+                                    <DialogClose className="border border-input bg-background hover:bg-accent hover:text-accent-foreground px-4 py-2 rounded-sm">
+                                      Cancel
+                                    </DialogClose>
+
+                                    <DialogClose
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90 px-4 py-2 rounded-sm"
                                       onClick={() => handleDeleteChat(chatId)}
                                     >
-                                      <DialogClose>Delete</DialogClose>
-                                    </Button>
+                                      Delete
+                                    </DialogClose>
                                   </div>
                                 </DialogHeader>
                               </DialogContent>
@@ -123,7 +118,10 @@ const SidebarTabs = ({
           {isLoading && <SidebarSkeleton />}
         </div>
       </Tabs.Content>
-      <Tabs.Content className="m-2 align-bottom overflow-y-auto" value="settings">
+      <Tabs.Content
+        className="m-2 align-bottom overflow-y-auto"
+        value="settings"
+      >
         <Settings chatOptions={chatOptions} setChatOptions={setChatOptions} />
       </Tabs.Content>
     </div>
