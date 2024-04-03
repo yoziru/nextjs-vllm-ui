@@ -2,11 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "../sidebar";
 import Chat, { ChatProps, ChatTopbarProps } from "./chat";

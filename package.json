@@ -18,6 +18,7 @@
     "ai": "^3.0.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "mistral-tokenizer-js": "^1.0.0",
     "next": "14.1.4",
     "next-themes": "^0.3.0",
     "openai": "^4.30.0",

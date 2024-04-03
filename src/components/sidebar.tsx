@@ -5,12 +5,11 @@ import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Message } from "ai/react";
 import Image from "next/image";
 
-import { Button } from "@/components/ui/button";
 import OllamaLogo from "../../public/ollama.png";
 import { ChatOptions } from "./chat/chat-options";
 import SidebarTabs from "./sidebar-tabs";
-import { RedirectType, redirect } from "next/navigation";
 import Link from "next/link";
+
 interface SidebarProps {
   isCollapsed: boolean;
   onClick?: () => void;
@@ -126,23 +125,29 @@ export function Sidebar({
     >
       <div className="sticky left-0 right-0 top-0 z-20 p-1 rounded-sm m-2">
         <Link
-          className="flex justify-between w-full h-10 text-sm font-medium items-center"
+          className="flex w-full h-10 text-sm font-medium items-center
+          border border-input bg-background hover:bg-accent hover:text-accent-foreground
+          px-2 py-2 rounded-sm"
           href="/"
-          onClick={() => {setChatId("");}}
+          onClick={() => {
+            setChatId("");
+          }}
         >
-          <div className="flex gap-3 items-center">
-            {!isCollapsed && !isMobile && (
-              <Image
-                src={OllamaLogo}
-                alt="AI"
-                width={14}
-                height={14}
-                className="dark:invert 2xl:block"
-              />
-            )}
-            New chat
+          <div className="flex gap-3 p-2 items-center justify-between w-full">
+            <div className="flex align-start gap-2">
+              {!isCollapsed && !isMobile && (
+                <Image
+                  src={OllamaLogo}
+                  alt="AI"
+                  width={14}
+                  height={14}
+                  className="dark:invert 2xl:block"
+                />
+              )}
+              <span>New chat</span>
+            </div>
+            <Pencil2Icon className="w-4 h-4" />
           </div>
-          <Pencil2Icon className="shrink-0 w-4 h-4" />
         </Link>
       </div>
       <SidebarTabs

@@ -7,6 +7,7 @@ import {
   CrossCircledIcon,
   DotFilledIcon,
   HamburgerMenuIcon,
+  InfoCircledIcon,
 } from "@radix-ui/react-icons";
 import { Message } from "ai/react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { encodeChat, tokenLimit } from "@/lib/token-counter";
 import { basePath, useHasMounted } from "@/lib/utils";
 import { Sidebar } from "../sidebar";
 import { ChatOptions } from "./chat-options";
@@ -42,6 +44,7 @@ export default function ChatTopbar({
   const hasMounted = useHasMounted();
 
   const currentModel = chatOptions && chatOptions.selectedModel;
+  const [error, setError] = React.useState<string | undefined>(undefined);
 
   const fetchData = async () => {
     if (!hasMounted) {
@@ -59,7 +62,6 @@ export default function ChatTopbar({
       if (!res.ok) {
         const errorResponse = await res.json();
         const errorMessage = `Connection to vLLM server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
-        toast.error(errorMessage);
         throw new Error(errorMessage);
       }
 
@@ -70,7 +72,7 @@ export default function ChatTopbar({
       setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
     } catch (error) {
       setChatOptions({ ...chatOptions, selectedModel: undefined });
-      console.log(error);
+      toast.error(error as string);
     }
   };
 
@@ -87,8 +89,10 @@ export default function ChatTopbar({
     );
   }
 
+  const chatTokens = messages.length > 0 ? encodeChat(messages) : 0;
+
   return (
-    <div className="w-full flex px-4 py-6 items-center justify-between lg:justify-center">
+    <div className="w-full flex px-4 py-4 items-center justify-between lg:justify-center">
       <Sheet>
         <SheetTrigger>
           <HamburgerMenuIcon className="lg:hidden w-5 h-5" />
@@ -105,8 +109,8 @@ export default function ChatTopbar({
         </SheetContent>
       </Sheet>
 
-      <div className="flex items-center gap-4">
-        <div className="w-full gap-1 flex justify-between items-center">
+      <div className="flex justify-center lg:justify-between gap-4 w-full">
+        <div className="gap-1 flex items-center">
           {currentModel !== undefined && (
             <>
               {isLoading ? (
@@ -139,6 +143,32 @@ export default function ChatTopbar({
               <CrossCircledIcon className="w-4 h-4 text-red-500" />
               <span className="text-xs">Connection to vLLM server failed</span>
             </>
+          )}
+        </div>
+        <div className="flex items-end gap-2">
+          {chatTokens > tokenLimit && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <span>
+                    <InfoCircledIcon className="w-4 h-4 text-blue-500" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent
+                  sideOffset={4}
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-sm text-xs"
+                >
+                  <p className="text-gray-500">
+                    Token limit exceeded. Truncating middle messages.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {messages.length > 0 && (
+            <span className="text-xs text-gray-500">
+              {chatTokens} / {tokenLimit} token{chatTokens > 1 ? "s" : ""}
+            </span>
           )}
         </div>
       </div>

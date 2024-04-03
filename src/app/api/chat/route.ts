@@ -4,11 +4,20 @@ import {
   ReconnectInterval,
 } from "eventsource-parser";
 import { NextRequest, NextResponse } from "next/server";
-import { ChatCompletionAssistantMessageParam, ChatCompletionCreateParamsStreaming, ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
+import {
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionCreateParamsStreaming,
+  ChatCompletionMessageParam,
+  ChatCompletionSystemMessageParam,
+  ChatCompletionUserMessageParam,
+} from "openai/resources/index.mjs";
 
+import { encodeChat, tokenLimit } from "@/lib/token-counter";
 
-
-const addSystemMessage = (messages: ChatCompletionMessageParam[], systemPrompt?: string) => {
+const addSystemMessage = (
+  messages: ChatCompletionMessageParam[],
+  systemPrompt?: string
+) => {
   // early exit if system prompt is empty
   if (!systemPrompt || systemPrompt === "") {
     return messages;
@@ -22,7 +31,7 @@ const addSystemMessage = (messages: ChatCompletionMessageParam[], systemPrompt?:
       {
         content: systemPrompt,
         role: "system",
-      } ,
+      },
     ];
   } else if (messages.length === 0) {
     // if there are no messages, add the system prompt as the first message
@@ -46,16 +55,55 @@ const addSystemMessage = (messages: ChatCompletionMessageParam[], systemPrompt?:
   return messages;
 };
 
-const formatMessages = (messages: ChatCompletionMessageParam[]): ChatCompletionMessageParam[] => {
-  return messages.map((m) => {
+const formatMessages = (
+  messages: ChatCompletionMessageParam[]
+): ChatCompletionMessageParam[] => {
+  let mappedMessages: ChatCompletionMessageParam[] = [];
+  let messagesTokenCounts: number[] = [];
+  const responseTokens = 512;
+  const tokenLimitRemaining = tokenLimit - responseTokens;
+  let tokenCount = 0;
+
+  messages.forEach((m) => {
     if (m.role === "system") {
-      return { role: "system", content: m.content } as ChatCompletionSystemMessageParam;
+      mappedMessages.push({
+        role: "system",
+        content: m.content,
+      } as ChatCompletionSystemMessageParam);
     } else if (m.role === "user") {
-      return { role: "user", content: m.content } as ChatCompletionUserMessageParam;
+      mappedMessages.push({
+        role: "user",
+        content: m.content,
+      } as ChatCompletionUserMessageParam);
+    } else if (m.role === "assistant") {
+      mappedMessages.push({
+        role: "assistant",
+        content: m.content,
+      } as ChatCompletionAssistantMessageParam);
     } else {
-      return { role: "assistant", content: m.content } as ChatCompletionAssistantMessageParam;
+      return;
     }
+
+    // ignore typing
+    // tslint:disable-next-line
+    const messageTokens = encodeChat([m]); 
+    messagesTokenCounts.push(messageTokens);
+    tokenCount += messageTokens;
   });
+
+  if (tokenCount <= tokenLimitRemaining) {
+    return mappedMessages;
+  }
+
+  // remove the middle messages until the token count is below the limit
+  while (tokenCount > tokenLimitRemaining) {
+    const middleMessageIndex = Math.floor(messages.length / 2);
+    const middleMessageTokens = messagesTokenCounts[middleMessageIndex];
+    mappedMessages.splice(middleMessageIndex, 1);
+    messagesTokenCounts.splice(middleMessageIndex, 1);
+    tokenCount -= middleMessageTokens;
+  }
+  return mappedMessages;
 };
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -121,8 +169,8 @@ const getOpenAIStream = async (
     //   type: "json_object",
     // }
     // top_p: 0.95,
-  }
-  const res = await fetch(apiUrl + "/v1/chat/completions",{
+  };
+  const res = await fetch(apiUrl + "/v1/chat/completions", {
     headers: headers,
     method: "POST",
     body: JSON.stringify(chatOptions),

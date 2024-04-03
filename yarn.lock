@@ -2535,6 +2535,11 @@ minimist@^1.2.0, minimist@^1.2.6:
   resolved "https://registry.yarnpkg.com/minipass/-/minipass-7.0.4.tgz#dbce03740f50a4786ba994c1fb908844d27b038c"
   integrity sha512-jYofLM5Dam9279rdkWzqHozUo4ybjdZmCsDHePy5V/PbBcVMiSZR97gmAy45aqi8CK1lG2ECd356FU86avfwUQ==
 
+mistral-tokenizer-js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/mistral-tokenizer-js/-/mistral-tokenizer-js-1.0.0.tgz#d501a3ecbe5ab4ea3cd2061e303510b864052e32"
+  integrity sha512-9+M/2Ul5M5oRFwX+QmwUIxpi7iptLgkIs87f3DEwVqmt/hQ7j4RGkawOBjs3LsmJzEbpSQcv8GGOMG1lwoAKyw==
+
 ms@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
