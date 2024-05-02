@@ -117,6 +117,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (!baseUrl) {
       throw new Error("VLLM_URL is not set");
     }
+    const apiKey = process.env.VLLM_API_KEY;
+
     const formattedMessages = formatMessages(
       addSystemMessage(messages, chatOptions.systemPrompt)
     );
@@ -125,7 +127,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       baseUrl,
       chatOptions.selectedModel,
       formattedMessages,
-      chatOptions.temperature
+      chatOptions.temperature,
+      apiKey,
     );
     return new NextResponse(stream, {
       headers: { "Content-Type": "text/event-stream" },

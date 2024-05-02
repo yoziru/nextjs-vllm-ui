@@ -71,6 +71,7 @@ mv .example.env .env
 
 ```
 VLLM_URL="http://localhost:8000"
+VLLM_API_KEY="your-api-key"
 ```
 
 **5. Install dependencies:**

@@ -14,6 +14,7 @@ RUN sed -Ei \
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV VLLM_URL="http://localhost:8000"
+ENV VLLM_API_KEY=""
 
 COPY . .
 RUN yarn build

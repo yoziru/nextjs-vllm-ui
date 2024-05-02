@@ -6,7 +6,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     if (!baseUrl) {
       throw new Error("VLLM_URL is not set");
     }
-    const res = await fetch(baseUrl + "/v1/models");
+    const apiKey = process.env.VLLM_API_KEY;
+    const headers = new Headers();
+    if (apiKey !== undefined) {
+      headers.set("Authorization", `Bearer ${apiKey}`);
+      headers.set("api-key", apiKey);
+    }
+    const res = await fetch(`${baseUrl}/v1/models`, { headers });
     if (res.status !== 200) {
       const statusText = res.statusText;
       const responseBody = await res.text();
