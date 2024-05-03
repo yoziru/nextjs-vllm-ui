@@ -121,7 +121,7 @@ export function Sidebar({
   return (
     <div
       data-collapsed={isCollapsed}
-      className="relative justify-between group lg:bg- accent/20 lg:dark:bg-card/35 flex flex-col h-full gap-4 data-[collapsed=true]:p-0"
+      className="relative justify-between group bg-accent/20 dark:bg-card/35 flex flex-col h-full gap-4 data-[collapsed=true]:p-0 data-[collapsed=true]:hidden"
     >
       <div className="sticky left-0 right-0 top-0 z-20 p-1 rounded-sm m-2">
         <Link

@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 
 import Image from "next/image";
 
-import { cn } from "@/lib/utils";
 import OllamaLogo from "../../../public/ollama.png";
 import CodeDisplayBlock from "../code-display-block";
 import { Message } from "ai";
@@ -12,6 +11,15 @@ interface ChatListProps {
   isLoading: boolean;
 }
 
+const MessageToolbar = () => (
+  <div className="mt-1 flex gap-3 empty:hidden juice:flex-row-reverse">
+    <div className="text-gray-400 flex self-end lg:self-center items-center justify-center lg:justify-start mt-0 -ml-1 h-7 gap-[2px] invisible">
+      <span>Regenerate</span>
+      <span>Edit</span>
+    </div>
+  </div>
+);
+
 export default function ChatList({ messages, isLoading }: ChatListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -20,8 +28,12 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
   };
 
   useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+    // if user scrolls up, disable auto-scroll
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
   if (messages.length === 0) {
     return (
@@ -34,7 +46,7 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
             height={60}
             className="h-20 w-14 object-contain dark:invert"
           />
-          <p className="text-center text-lg text-muted-foreground">
+          <p className="text-center text-xl text-muted-foreground">
             How can I help you today?
           </p>
         </div>
@@ -47,57 +59,71 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
       id="scroller"
       className="w-[800px] overflow-y-scroll overflow-x-hidden h-full justify-center m-auto"
     >
-      <div className="flex flex-col overflow-x-hidden overflow-y-hidden min-h-full justify-end">
+      <div className="px-4 py-2 justify-center text-base md:gap-6 m-auto">
         {messages
           .filter((message) => message.role !== "system")
           .map((message, index) => (
             <div
               key={index}
-              className={cn(
-                "flex flex-col gap-2 p-4 whitespace-pre-wrap",
-                message.role === "user" ? "items-start" : "items-start"
-              )}
+              className="flex flex-1 text-base mx-auto gap-3 juice:gap-4 juice:md:gap-6 md:px-5 lg:px-1 xl:px-5 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]"
             >
-              <div className="flex gap-3 items-center">
+              <div className="flex flex-1 text-base mx-auto gap-3 juice:gap-4 juice:md:gap-6 md:px-5 lg:px-1 xl:px-5 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]">
+                <div className="flex-shrink-0 flex flex-col relative items-end">
+                  <div className="pt-0.5">
+                    <div className="gizmo-shadow-stroke flex h-6 w-6 items-center justify-center overflow-hidden rounded-full">
+                      {message.role === "user" ? (
+                        <div className="dark:invert h-full w-full bg-black" />
+                      ) : (
+                        <Image
+                          src={OllamaLogo}
+                          alt="AI"
+                          className="object-contain dark:invert aspect-square h-full w-full"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
                 {message.role === "user" && (
-                  <div>
+                  <div className="relative flex w-full min-w-0 flex-col">
                     <div className="font-semibold pb-2">You</div>
-                    <div className="bg-accent gap-1 p-2 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
+                    <div className="flex-col gap-1 md:gap-3">
                       {message.content}
                     </div>
+                    <MessageToolbar />
                   </div>
                 )}
                 {message.role === "assistant" && (
-                  <div className="flex items-end gap-2">
-                    <div className="flex justify-start items-center mt-0 mb-auto relative h-10 w-10 shrink-0 overflow-hidden">
-                      <Image
-                        src={OllamaLogo}
-                        alt="AI"
-                        className="object-contain dark:invert aspect-square h-full w-full"
-                      />
+                  <div className="relative flex w-full min-w-0 flex-col">
+                    <div className="font-semibold pb-2">Assistant</div>
+                    <div className="flex-col gap-1 md:gap-3">
+                      <span className="whitespace-pre-wrap">
+                        {/* Check if the message content contains a code block */}
+                        {message.content.split("```").map((part, index) => {
+                          if (index % 2 === 0) {
+                            return (
+                              <React.Fragment key={index}>
+                                {part}
+                              </React.Fragment>
+                            );
+                          } else {
+                            return (
+                              <CodeDisplayBlock
+                                key={index}
+                                code={part.trim()}
+                                lang=""
+                              />
+                            );
+                          }
+                        })}
+                        {isLoading &&
+                          messages.indexOf(message) === messages.length - 1 && (
+                            <span className="animate-pulse" aria-label="Typing">
+                              ...
+                            </span>
+                          )}
+                      </span>
                     </div>
-                    <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
-                      {/* Check if the message content contains a code block */}
-                      {message.content.split("```").map((part, index) => {
-                        if (index % 2 === 0) {
-                          return (
-                            <React.Fragment key={index}>{part}</React.Fragment>
-                          );
-                        } else {
-                          return (
-                            <pre className="whitespace-pre-wrap" key={index}>
-                              <CodeDisplayBlock code={part} lang="" />
-                            </pre>
-                          );
-                        }
-                      })}
-                      {isLoading &&
-                        messages.indexOf(message) === messages.length - 1 && (
-                          <span className="animate-pulse" aria-label="Typing">
-                            ...
-                          </span>
-                        )}
-                    </span>
+                    <MessageToolbar />
                   </div>
                 )}
               </div>

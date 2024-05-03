@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 
-import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { cn } from "@/lib/utils";
 import { Sidebar } from "../sidebar";
 import Chat, { ChatProps, ChatTopbarProps } from "./chat";
 
@@ -19,7 +17,7 @@ type MergedProps = ChatLayoutProps & ChatProps & ChatTopbarProps;
 export function ChatLayout({
   defaultLayout = [30, 160],
   defaultCollapsed = false,
-  navCollapsedSize,
+  navCollapsedSize = 768,
   messages,
   input,
   handleInputChange,
@@ -32,12 +30,13 @@ export function ChatLayout({
   chatOptions,
   setChatOptions,
 }: MergedProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkScreenWidth = () => {
-      setIsMobile(window.innerWidth <= 1023);
+      setIsMobile(window.innerWidth <= 768);
+      setIsCollapsed(window.innerWidth <= 768);
     };
 
     // Initial check
@@ -53,49 +52,18 @@ export function ChatLayout({
   }, []);
 
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      onLayout={(sizes: number[]) => {
-        document.cookie = `react-resizable-panels:layout=${JSON.stringify(
-          sizes
-        )}`;
-      }}
-      className="h-screen items-stretch"
-    >
-      <ResizablePanel
-        defaultSize={defaultLayout[0]}
-        collapsedSize={navCollapsedSize}
-        collapsible={true}
-        minSize={isMobile ? 0 : 20}
-        maxSize={isMobile ? 0 : 20}
-        onCollapse={() => {
-          setIsCollapsed(true);
-          document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-            true
-          )}`;
-        }}
-        onExpand={() => {
-          setIsCollapsed(false);
-          document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-            false
-          )}`;
-        }}
-        className={cn(
-          isCollapsed
-            ? "min-w-[50px] md:min-w-[70px] transition-all duration-300 ease-in-out"
-            : "hidden md:block"
-        )}
-      >
+    <div className="relative z-0 flex h-full w-full overflow-hidden">
+      <div className="flex-shrink-0 overflow-x-hidden bg-token-sidebar-surface-primary md:w-[260px]">
         <Sidebar
-          isCollapsed={isCollapsed || isMobile}
+          isCollapsed={isCollapsed}
           isMobile={isMobile}
           chatId={chatId}
           setChatId={setChatId}
           chatOptions={chatOptions}
           setChatOptions={setChatOptions}
         />
-      </ResizablePanel>
-      <ResizablePanel className="h-full" defaultSize={defaultLayout[1]}>
+      </div>
+      <div className="relative flex h-full max-w-full flex-1 flex-col overflow-hidden">
         <Chat
           chatId={chatId}
           setChatId={setChatId}
@@ -109,7 +77,7 @@ export function ChatLayout({
           error={error}
           stop={stop}
         />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+      </div>
+    </div>
   );
 }

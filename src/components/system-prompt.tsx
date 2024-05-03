@@ -41,7 +41,7 @@ export default function SystemPrompt({
 
       <div className="m-2">
         <Textarea
-          className="resize-none"
+          className="resize-none bg-white/20 dark:bg-card/35"
           autoComplete="off"
           rows={7}
           value={text}

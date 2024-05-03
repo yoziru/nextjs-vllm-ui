@@ -82,7 +82,7 @@ export default function ChatTopbar({
 
   if (!hasMounted) {
     return (
-      <div className="w-full flex px-4 py-6 items-center gap-1 lg:justify-center">
+      <div className="md:w-full flex px-4 py-6 items-center gap-1 md:justify-center">
         <DotFilledIcon className="w-4 h-4 text-blue-500" />
         <span className="text-xs">Booting up..</span>
       </div>
@@ -92,24 +92,28 @@ export default function ChatTopbar({
   const chatTokens = messages.length > 0 ? encodeChat(messages) : 0;
 
   return (
-    <div className="w-full flex px-4 py-4 items-center justify-between lg:justify-center">
+    <div className="md:w-full flex px-4 py-4 items-center justify-between md:justify-center">
       <Sheet>
         <SheetTrigger>
-          <HamburgerMenuIcon className="lg:hidden w-5 h-5" />
+          <div className="flex items-center gap-2">
+            <HamburgerMenuIcon className="md:hidden w-5 h-5" />
+          </div>
         </SheetTrigger>
         <SheetContent side="left">
-          <Sidebar
-            chatId={chatId || ""}
-            setChatId={setChatId}
-            isCollapsed={false}
-            isMobile={false}
-            chatOptions={chatOptions}
-            setChatOptions={setChatOptions}
-          />
+          <div className="w-[260px] bg-amber-100">
+            <Sidebar
+              chatId={chatId || ""}
+              setChatId={setChatId}
+              isCollapsed={false}
+              isMobile={false}
+              chatOptions={chatOptions}
+              setChatOptions={setChatOptions}
+            />
+          </div>
         </SheetContent>
       </Sheet>
 
-      <div className="flex justify-center lg:justify-between gap-4 w-full">
+      <div className="flex justify-center md:justify-between gap-4 w-full">
         <div className="gap-1 flex items-center">
           {currentModel !== undefined && (
             <>

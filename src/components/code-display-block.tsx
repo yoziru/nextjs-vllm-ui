@@ -28,18 +28,6 @@ export default function CodeDisplayBlock({ code, lang }: ButtonCodeblockProps) {
 
   return (
     <div className="relative my-4 overflow-scroll overflow-x-scroll  flex flex-col   text-start  ">
-      <Button
-        onClick={copyToClipboard}
-        variant="ghost"
-        size="icon"
-        className="h-5 w-5 absolute top-2 right-2"
-      >
-        {isCopied ? (
-          <CheckIcon className="w-4 h-4 scale-100 transition-all" />
-        ) : (
-          <CopyIcon className="w-4 h-4 scale-100 transition-all" />
-        )}
-      </Button>
       <CodeBlock
         customStyle={
           theme === "dark"
@@ -51,6 +39,18 @@ export default function CodeDisplayBlock({ code, lang }: ButtonCodeblockProps) {
         showLineNumbers={false}
         theme={theme === "dark" ? dracula : github}
       />
+      <Button
+        onClick={copyToClipboard}
+        variant="ghost"
+        size="iconSm"
+        className="h-5 w-5 absolute top-2 right-2"
+      >
+        {isCopied ? (
+          <CheckIcon className="w-4 h-4" />
+        ) : (
+          <CopyIcon className="w-4 h-4" />
+        )}
+      </Button>
     </div>
   );
 }

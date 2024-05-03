@@ -58,7 +58,7 @@ export default function Settings({
   setChatOptions,
 }: SystemPromptProps) {
   return (
-    <div className="overflow-y-auto h-full">
+    <>
       <SystemPrompt chatOptions={chatOptions} setChatOptions={setChatOptions} />
       <TemperatureSlider
         chatOptions={chatOptions}
@@ -66,6 +66,6 @@ export default function Settings({
       />
       <SettingsThemeToggle />
       <ClearChatsButton />
-    </div>
+    </>
   );
 }
