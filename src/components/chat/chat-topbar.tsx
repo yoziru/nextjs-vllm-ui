@@ -51,13 +51,7 @@ export default function ChatTopbar({
       return null;
     }
     try {
-      const res = await fetch(basePath + "/api/models", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "cache-control": "no-cache",
-        },
-      });
+      const res = await fetch(basePath + "/api/models");
 
       if (!res.ok) {
         const errorResponse = await res.json();

@@ -12,7 +12,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       headers.set("Authorization", `Bearer ${apiKey}`);
       headers.set("api-key", apiKey);
     }
-    const res = await fetch(`${baseUrl}/v1/models`, { headers });
+    const res = await fetch(`${baseUrl}/v1/models`, {
+      headers: headers,
+      cache: "no-store",
+    });
     if (res.status !== 200) {
       const statusText = res.statusText;
       const responseBody = await res.text();
