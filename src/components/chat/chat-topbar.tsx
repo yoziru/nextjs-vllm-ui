@@ -94,7 +94,7 @@ export default function ChatTopbar({
           </div>
         </SheetTrigger>
         <SheetContent side="left">
-          <div className="w-[260px] bg-amber-100">
+          <div>
             <Sidebar
               chatId={chatId || ""}
               setChatId={setChatId}
