@@ -19,8 +19,6 @@ This project aims to be the easiest way for you to get started with LLMs. No ted
 - **Easy setup:** No tedious and annoying setup required. Just clone the repo and you're good to go!
 - **Code syntax highligting:** Messages that include code, will be highlighted for easy access.
 - **Copy codeblocks easily:** Easily copy the highlighted code with one click.
-- **Download/Pull & Delete models:** Easily download and delete models directly from the interface.
-- **Switch between models:** Switch between models fast with a click.
 - **Chat history:** Chats are saved and easily accessed.
 - **Light & Dark mode:** Switch between light & dark mode.
 
@@ -41,6 +39,11 @@ The easiest way to get started is to use the pre-built Docker image.
 
 ```
 docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:8000 ghcr.io/yoziru/nextjs-vllm-ui:latest
+```
+
+If you're using Ollama, you need to set the `VLLM_MODEL`:
+```
+docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:11434 -e NEXT_PUBLIC_TOKEN_LIMIT=8192 -e VLLM_MODEL=llama3 ghcr.io/yoziru/nextjs-vllm-ui:latest
 ```
 
 Then go to [localhost:3000](http://localhost:3000) and start chatting with your favourite model!

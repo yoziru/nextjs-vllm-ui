@@ -1,17 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  const baseUrl = process.env.VLLM_URL;
+  const apiKey = process.env.VLLM_API_KEY;
+  const headers = new Headers();
+  if (apiKey !== undefined) {
+    headers.set("Authorization", `Bearer ${apiKey}`);
+    headers.set("api-key", apiKey);
+  }
+  if (!baseUrl) {
+    throw new Error("VLLM_URL is not set");
+  }
+
+  const envModel = process.env.VLLM_MODEL;
+  if (envModel) {
+    return NextResponse.json({
+      object: "list",
+      data: [
+        {
+          id: envModel,
+        },
+      ],
+    });
+  }
+
   try {
-    const baseUrl = process.env.VLLM_URL;
-    if (!baseUrl) {
-      throw new Error("VLLM_URL is not set");
-    }
-    const apiKey = process.env.VLLM_API_KEY;
-    const headers = new Headers();
-    if (apiKey !== undefined) {
-      headers.set("Authorization", `Bearer ${apiKey}`);
-      headers.set("api-key", apiKey);
-    }
     const res = await fetch(`${baseUrl}/v1/models`, {
       headers: headers,
       cache: "no-store",
