@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { encodeChat, tokenLimit } from "@/lib/token-counter";
+import { encodeChat, getTokenLimit } from "@/lib/token-counter";
 import { basePath, useHasMounted } from "@/lib/utils";
 import { Sidebar } from "../sidebar";
 import { ChatOptions } from "./chat-options";
@@ -44,6 +44,7 @@ export default function ChatTopbar({
   const hasMounted = useHasMounted();
 
   const currentModel = chatOptions && chatOptions.selectedModel;
+  const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
   const [error, setError] = React.useState<string | undefined>(undefined);
 
   const fetchData = async () => {
@@ -72,6 +73,7 @@ export default function ChatTopbar({
 
   useEffect(() => {
     fetchData();
+    getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
   }, [hasMounted]);
 
   if (!hasMounted) {

@@ -4,10 +4,11 @@ import React from "react";
 
 import { PaperPlaneIcon, StopIcon } from "@radix-ui/react-icons";
 import { ChatRequestOptions } from "ai";
-import mistralTokenizer from "mistral-tokenizer-js";
+import llama3Tokenizer from "llama3-tokenizer-js";
 import TextareaAutosize from "react-textarea-autosize";
 
-import { tokenLimit } from "@/lib/token-counter";
+import { basePath, useHasMounted } from "@/lib/utils";
+import { getTokenLimit } from "@/lib/token-counter";
 import { Button } from "../ui/button";
 
 interface ChatBottombarProps {
@@ -30,6 +31,7 @@ export default function ChatBottombar({
   isLoading,
   stop,
 }: ChatBottombarProps) {
+  const hasMounted = useHasMounted();
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const hasSelectedModel = selectedModel && selectedModel !== "";
 
@@ -39,7 +41,12 @@ export default function ChatBottombar({
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
   };
-  const tokenCount = input ? mistralTokenizer.encode(input).length - 1 : 0;
+  const tokenCount = input ? llama3Tokenizer.encode(input).length - 1 : 0;
+
+  const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
+  React.useEffect(() => {
+    getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
+  }, [hasMounted]);
 
   return (
     <div>

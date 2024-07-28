@@ -28,7 +28,7 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
     setMessages,
   } = useChat({
     api: basePath + "/api/chat",
-    streamMode: "text",
+    streamMode: "stream-data",
     onError: (error) => {
       toast.error("Something went wrong: " + error);
     },
