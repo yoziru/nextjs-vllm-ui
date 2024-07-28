@@ -12,7 +12,7 @@ import {
   ChatCompletionUserMessageParam,
 } from "openai/resources/index.mjs";
 
-import { encodeChat, tokenLimit } from "@/lib/token-counter";
+import { encodeChat } from "@/lib/token-counter";
 
 const addSystemMessage = (
   messages: ChatCompletionMessageParam[],
@@ -56,12 +56,14 @@ const addSystemMessage = (
 };
 
 const formatMessages = (
-  messages: ChatCompletionMessageParam[]
+  messages: ChatCompletionMessageParam[],
+  tokenLimit: number = 4096
 ): ChatCompletionMessageParam[] => {
   let mappedMessages: ChatCompletionMessageParam[] = [];
   let messagesTokenCounts: number[] = [];
-  const responseTokens = 512;
-  const tokenLimitRemaining = tokenLimit - responseTokens;
+  const reservedResponseTokens = 512;
+
+  const tokenLimitRemaining = tokenLimit - reservedResponseTokens;
   let tokenCount = 0;
 
   messages.forEach((m) => {
@@ -86,7 +88,7 @@ const formatMessages = (
 
     // ignore typing
     // tslint:disable-next-line
-    const messageTokens = encodeChat([m]); 
+    const messageTokens = encodeChat([m]);
     messagesTokenCounts.push(messageTokens);
     tokenCount += messageTokens;
   });
@@ -119,8 +121,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
     const apiKey = process.env.VLLM_API_KEY;
 
+    const tokenLimit = process.env.VLLM_TOKEN_LIMIT
+      ? parseInt(process.env.VLLM_TOKEN_LIMIT)
+      : 4096;
+
     const formattedMessages = formatMessages(
-      addSystemMessage(messages, chatOptions.systemPrompt)
+      addSystemMessage(messages, chatOptions.systemPrompt),
+      tokenLimit
     );
 
     const stream = await getOpenAIStream(
@@ -128,7 +135,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       chatOptions.selectedModel,
       formattedMessages,
       chatOptions.temperature,
-      apiKey,
+      apiKey
     );
     return new NextResponse(stream, {
       headers: { "Content-Type": "text/event-stream" },

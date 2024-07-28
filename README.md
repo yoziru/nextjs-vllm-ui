@@ -43,7 +43,7 @@ docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:8000 ghc
 
 If you're using Ollama, you need to set the `VLLM_MODEL`:
 ```
-docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:11434 -e NEXT_PUBLIC_TOKEN_LIMIT=8192 -e VLLM_MODEL=llama3 ghcr.io/yoziru/nextjs-vllm-ui:latest
+docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:11434 -e VLLM_TOKEN_LIMIT=8192 -e VLLM_MODEL=llama3 ghcr.io/yoziru/nextjs-vllm-ui:latest
 ```
 
 Then go to [localhost:3000](http://localhost:3000) and start chatting with your favourite model!
