@@ -41,12 +41,16 @@ export default function ChatBottombar({
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
   };
-  const tokenCount = input ? llama3Tokenizer.encode(input).length - 1 : 0;
 
   const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
   React.useEffect(() => {
     getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
   }, [hasMounted]);
+
+  const tokenCount = React.useMemo(
+    () => (input ? llama3Tokenizer.encode(input).length - 1 : 0),
+    [input]
+  );
 
   return (
     <div>
