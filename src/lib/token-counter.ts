@@ -1,5 +1,5 @@
 import { CoreMessage, Message } from "ai";
-import mistralTokenizer from "mistral-tokenizer-js";
+import llama3Tokenizer from "llama3-tokenizer-js";
 
 export const getTokenLimit = async (basePath: string) => {
   const res = await fetch(basePath + "/api/settings");
@@ -18,9 +18,9 @@ export const encodeChat = (messages: Message[] | CoreMessage[]): number => {
   let numTokens = 0;
   for (const message of messages) {
     numTokens += tokensPerMessage;
-    numTokens += mistralTokenizer.encode(message.role).length;
+    numTokens += llama3Tokenizer.encode(message.role).length;
     if (typeof message.content === "string") {
-      numTokens += mistralTokenizer.encode(message.content).length;
+      numTokens += llama3Tokenizer.encode(message.content).length;
     }
   }
   numTokens += 3;
