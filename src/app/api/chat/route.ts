@@ -1,23 +1,20 @@
 import {
-  createParser,
-  ParsedEvent,
-  ReconnectInterval,
-} from "eventsource-parser";
+  streamText,
+  CoreMessage,
+  CoreUserMessage,
+  CoreSystemMessage,
+  CoreAssistantMessage,
+} from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30;
+
 import { NextRequest, NextResponse } from "next/server";
-import {
-  ChatCompletionAssistantMessageParam,
-  ChatCompletionCreateParamsStreaming,
-  ChatCompletionMessageParam,
-  ChatCompletionSystemMessageParam,
-  ChatCompletionUserMessageParam,
-} from "openai/resources/index.mjs";
 
 import { encodeChat } from "@/lib/token-counter";
 
-const addSystemMessage = (
-  messages: ChatCompletionMessageParam[],
-  systemPrompt?: string
-) => {
+const addSystemMessage = (messages: CoreMessage[], systemPrompt?: string) => {
   // early exit if system prompt is empty
   if (!systemPrompt || systemPrompt === "") {
     return messages;
@@ -56,10 +53,10 @@ const addSystemMessage = (
 };
 
 const formatMessages = (
-  messages: ChatCompletionMessageParam[],
+  messages: CoreMessage[],
   tokenLimit: number = 4096
-): ChatCompletionMessageParam[] => {
-  let mappedMessages: ChatCompletionMessageParam[] = [];
+): CoreMessage[] => {
+  let mappedMessages: CoreMessage[] = [];
   let messagesTokenCounts: number[] = [];
   const reservedResponseTokens = 512;
 
@@ -71,17 +68,17 @@ const formatMessages = (
       mappedMessages.push({
         role: "system",
         content: m.content,
-      } as ChatCompletionSystemMessageParam);
+      } as CoreSystemMessage);
     } else if (m.role === "user") {
       mappedMessages.push({
         role: "user",
         content: m.content,
-      } as ChatCompletionUserMessageParam);
+      } as CoreUserMessage);
     } else if (m.role === "assistant") {
       mappedMessages.push({
         role: "assistant",
         content: m.content,
-      } as ChatCompletionAssistantMessageParam);
+      } as CoreAssistantMessage);
     } else {
       return;
     }
@@ -108,7 +105,8 @@ const formatMessages = (
   return mappedMessages;
 };
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export async function POST(req: Request) {
+  // export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { messages, chatOptions } = await req.json();
     if (!chatOptions.selectedModel || chatOptions.selectedModel === "") {
@@ -130,16 +128,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       tokenLimit
     );
 
-    const stream = await getOpenAIStream(
-      baseUrl,
-      chatOptions.selectedModel,
-      formattedMessages,
-      chatOptions.temperature,
-      apiKey
-    );
-    return new NextResponse(stream, {
-      headers: { "Content-Type": "text/event-stream" },
+    // Call the language model
+    const customOpenai = createOpenAI({
+      baseUrl: baseUrl + "/v1",
+      apiKey: apiKey ?? "",
     });
+
+    const result = await streamText({
+      model: customOpenai(chatOptions.selectedModel),
+      messages: formattedMessages,
+      temperature: chatOptions.temperature,
+      // async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
+      //   // implement your own logic here, e.g. for storing messages
+      //   // or recording token usage
+      // },
+    });
+
+    // Respond with the stream
+    return result.toAIStreamResponse();
+
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -151,79 +158,3 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
   }
 }
-
-const getOpenAIStream = async (
-  apiUrl: string,
-  model: string,
-  messages: ChatCompletionMessageParam[],
-  temperature?: number,
-  apiKey?: string
-): Promise<ReadableStream<Uint8Array>> => {
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-  const headers = new Headers();
-  headers.set("Content-Type", "application/json");
-  if (apiKey !== undefined) {
-    headers.set("Authorization", `Bearer ${apiKey}`);
-    headers.set("api-key", apiKey);
-  }
-  const chatOptions: ChatCompletionCreateParamsStreaming = {
-    model: model,
-    // frequency_penalty: 0,
-    // max_tokens: 2000,
-    messages: messages,
-    // presence_penalty: 0,
-    stream: true,
-    temperature: temperature ?? 0.5,
-    // response_format: {
-    //   type: "json_object",
-    // }
-    // top_p: 0.95,
-  };
-  const res = await fetch(apiUrl + "/v1/chat/completions", {
-    headers: headers,
-    method: "POST",
-    body: JSON.stringify(chatOptions),
-  });
-
-  if (res.status !== 200) {
-    const statusText = res.statusText;
-    const responseBody = await res.text();
-    console.error(`vLLM API response error: ${responseBody}`);
-    throw new Error(
-      `The vLLM API has encountered an error with a status code of ${res.status} ${statusText}: ${responseBody}`
-    );
-  }
-
-  return new ReadableStream({
-    async start(controller) {
-      const onParse = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === "event") {
-          const data = event.data;
-
-          if (data === "[DONE]") {
-            controller.close();
-            return;
-          }
-
-          try {
-            const json = JSON.parse(data);
-            const text = json.choices[0].delta.content;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
-          }
-        }
-      };
-
-      const parser = createParser(onParse);
-
-      for await (const chunk of res.body as any) {
-        // An extra newline is required to make AzureOpenAI work.
-        const str = decoder.decode(chunk).replace("[DONE]\n", "[DONE]\n\n");
-        parser.feed(str);
-      }
-    },
-  });
-};
