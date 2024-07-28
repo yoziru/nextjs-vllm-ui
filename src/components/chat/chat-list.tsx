@@ -4,6 +4,8 @@ import Image from "next/image";
 
 import OllamaLogo from "../../../public/ollama.png";
 import CodeDisplayBlock from "../code-display-block";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Message } from "ai";
 
 interface ChatListProps {
@@ -101,9 +103,9 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
                         {message.content.split("```").map((part, index) => {
                           if (index % 2 === 0) {
                             return (
-                              <React.Fragment key={index}>
+                              <Markdown key={index} remarkPlugins={[remarkGfm]}>
                                 {part}
-                              </React.Fragment>
+                              </Markdown>
                             );
                           } else {
                             return (
