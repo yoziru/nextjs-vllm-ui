@@ -7,6 +7,7 @@ import CodeDisplayBlock from "../code-display-block";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Message } from "ai";
+import ThinkBlock from "../think-block";
 
 interface ChatListProps {
   messages: Message[];
@@ -21,6 +22,47 @@ const MessageToolbar = () => (
     </div>
   </div>
 );
+
+// Utility to process <think> tags
+function processThinkTags(content: string, isLoading: boolean, message: Message | undefined, prevUserMessage: Message | undefined) {
+  const thinkOpen = content.indexOf("<think>");
+  const thinkClose = content.indexOf("</think>");
+
+  // If <think> is present and </think> is not, show live thinking content
+  if (thinkOpen !== -1 && thinkClose === -1) {
+    // Show everything before <think>, then the ThinkBlock component with live mode
+    const before = content.slice(0, thinkOpen);
+    const thinkContent = content.slice(thinkOpen + 7); // everything after <think>
+    return [
+      before,
+      <ThinkBlock key="live-think" content={thinkContent.trim()} live={true} />,
+    ];
+  }
+
+  // If both <think> and </think> are present, show collapsible block
+  if (thinkOpen !== -1 && thinkClose !== -1) {
+    const before = content.slice(0, thinkOpen);
+    const thinkContent = content.slice(thinkOpen + 7, thinkClose);
+    const after = content.slice(thinkClose + 8);
+    // Calculate duration if timestamps are available
+    let duration;
+    if (message?.createdAt && prevUserMessage?.createdAt) {
+      const start = new Date(prevUserMessage.createdAt).getTime();
+      const end = new Date(message.createdAt).getTime();
+      if (!isNaN(start) && !isNaN(end) && end > start) {
+        duration = ((end - start) / 1000).toFixed(2) + " seconds";
+      }
+    }
+    return [
+      before,
+      <ThinkBlock key="collapsible-think" content={thinkContent.trim()} duration={duration} />,
+      after,
+    ];
+  }
+
+  // No <think> tag, return as is
+  return [content];
+}
 
 export default function ChatList({ messages, isLoading }: ChatListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -102,10 +144,17 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
                         {/* Check if the message content contains a code block */}
                         {message.content.split("```").map((part, index) => {
                           if (index % 2 === 0) {
-                            return (
-                              <Markdown key={index} remarkPlugins={[remarkGfm]}>
-                                {part}
-                              </Markdown>
+                            // Find previous user message
+                            const prevUserMessage = messages.slice(0, messages.indexOf(message)).reverse().find(m => m.role === "user");
+                            // Process <think> tags before rendering Markdown
+                            return processThinkTags(part, isLoading, message, prevUserMessage).map((segment, segIdx) =>
+                              typeof segment === "string" ? (
+                                <Markdown key={index + "-" + segIdx} remarkPlugins={[remarkGfm]}>
+                                  {segment}
+                                </Markdown>
+                              ) : (
+                                segment // This is the <Thinking /> component
+                              )
                             );
                           } else {
                             return (
