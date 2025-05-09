@@ -3,7 +3,10 @@ ARG NODE_VERSION=lts
 FROM node:$NODE_VERSION-alpine AS builder
 ENV YARN_CACHE_FOLDER=/opt/yarncache
 WORKDIR /opt/app
-COPY package.json yarn.lock .yarnrc.yml .yarn/ ./
+
+# Copy only the necessary files for Yarn
+COPY .yarnrc.yml package.json yarn.lock ./
+
 RUN corepack enable && yarn install --immutable
 # patch logging for requestHandler
 RUN sed -Ei \
@@ -13,7 +16,7 @@ RUN sed -Ei \
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV VLLM_URL="http://localhost:8000"
+ENV VLLM_URL=""
 ENV VLLM_API_KEY=""
 
 COPY . .
@@ -23,8 +26,8 @@ RUN yarn build
 FROM node:$NODE_VERSION-alpine AS runner
 WORKDIR /opt/app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -40,9 +43,8 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/static ./.next/static
 
-# Copy Yarn Berry files for runtime (if needed for PnP or CLI usage)
+# Copy only the necessary files for runtime
 COPY --from=builder /opt/app/.yarnrc.yml ./
-COPY --from=builder /opt/app/.yarn ./.yarn
 COPY --from=builder /opt/app/package.json ./
 COPY --from=builder /opt/app/yarn.lock ./
 
@@ -50,7 +52,7 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 # set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
+ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
