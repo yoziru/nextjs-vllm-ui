@@ -3,8 +3,8 @@ ARG NODE_VERSION=lts
 FROM node:$NODE_VERSION-alpine AS builder
 ENV YARN_CACHE_FOLDER=/opt/yarncache
 WORKDIR /opt/app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package.json yarn.lock .yarnrc.yml .yarn/ ./
+RUN corepack enable && yarn install --immutable
 # patch logging for requestHandler
 RUN sed -Ei \
     -e '/await requestHandler/iconst __start = new Date;' \
@@ -39,6 +39,12 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/static ./.next/static
+
+# Copy Yarn Berry files for runtime (if needed for PnP or CLI usage)
+COPY --from=builder /opt/app/.yarnrc.yml ./
+COPY --from=builder /opt/app/.yarn ./.yarn
+COPY --from=builder /opt/app/package.json ./
+COPY --from=builder /opt/app/yarn.lock ./
 
 USER nextjs
 
