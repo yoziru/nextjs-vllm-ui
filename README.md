@@ -123,3 +123,18 @@ docker build . -t ghcr.io/yoziru/nextjs-vllm-ui:latest \
 [shadcn-ui](https://ui.shadcn.com/) - UI component built using Radix UI and Tailwind CSS
 
 [shadcn-chat](https://github.com/jakobhoeg/shadcn-chat) - Chat components for NextJS/React projects
+
+## Example Python backend
+
+The repository now includes a simple Flask server under `backend/` that
+mimics an OpenAI compatible `/api/chat` endpoint. It currently echoes back
+the last user message but can be extended to call a vLLM instance.
+
+Run it with:
+
+```bash
+pip install flask
+python backend/server.py
+```
+
+Then point the frontend to `http://localhost:5000/api/chat`.
