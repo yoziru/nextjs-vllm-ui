@@ -101,7 +101,7 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
   return (
     <div
       id="scroller"
-      className="w-[800px] overflow-y-scroll overflow-x-hidden h-full justify-center m-auto"
+      className="w-full md:w-[800px] max-w-full overflow-y-scroll overflow-x-hidden h-full justify-center m-auto"
     >
       <div className="px-4 py-2 justify-center text-base md:gap-6 m-auto">
         {messages
