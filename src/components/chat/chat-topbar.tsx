@@ -62,18 +62,25 @@ export default function ChatTopbar({
 
       const data = await res.json();
       // Extract the "name" field from each model object and store them in the state
+      if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
+        throw new Error("No models available from vLLM server");
+      }
       const modelNames = data.data.map((model: any) => model.id);
       // save the first and only model in the list as selectedModel in localstorage
       setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
     } catch (error) {
       setChatOptions({ ...chatOptions, selectedModel: undefined });
-      toast.error(error as string);
+      toast.error(error instanceof Error ? error.message : String(error));
     }
   };
 
   useEffect(() => {
     fetchData();
-    getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
+    getTokenLimit(basePath)
+      .then((limit) => setTokenLimit(limit))
+      .catch((error) => {
+        console.error("Failed to get token limit:", error);
+      });
   }, [hasMounted]);
 
   if (!hasMounted) {

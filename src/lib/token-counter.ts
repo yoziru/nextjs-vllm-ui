@@ -1,16 +1,22 @@
 import { CoreMessage, Message } from "ai";
 import llama3Tokenizer from "llama3-tokenizer-js";
 
-export const getTokenLimit = async (basePath: string) => {
-  const res = await fetch(basePath + "/api/settings");
+const DEFAULT_TOKEN_LIMIT = 4096;
 
-  if (!res.ok) {
-    const errorResponse = await res.json();
-    const errorMessage = `Connection to vLLM server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
-    throw new Error(errorMessage);
+export const getTokenLimit = async (basePath: string): Promise<number> => {
+  try {
+    const res = await fetch(basePath + "/api/settings");
+
+    if (!res.ok) {
+      console.error(`Failed to fetch settings: ${res.status} ${res.statusText}`);
+      return DEFAULT_TOKEN_LIMIT;
+    }
+    const data = await res.json();
+    return data.tokenLimit ?? DEFAULT_TOKEN_LIMIT;
+  } catch (error) {
+    console.error("Failed to fetch token limit:", error);
+    return DEFAULT_TOKEN_LIMIT;
   }
-  const data = await res.json();
-  return data.tokenLimit;
 };
 
 export const encodeChat = (messages: Message[] | CoreMessage[]): number => {
