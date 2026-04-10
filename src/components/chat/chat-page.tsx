@@ -37,7 +37,10 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
     "chatOptions",
     {
       defaultValue: {
+        provider: "vllm",
         selectedModel: "",
+        apiBaseUrl: "",
+        apiKey: "",
         systemPrompt: "",
         temperature: 0.9,
       },

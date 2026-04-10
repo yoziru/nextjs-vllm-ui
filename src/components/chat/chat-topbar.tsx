@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { encodeChat, getTokenLimit } from "@/lib/token-counter";
 import { basePath, useHasMounted } from "@/lib/utils";
+import { providerLabels } from "@/lib/llm-providers";
 import { Sidebar } from "../sidebar";
 import { ChatOptions } from "./chat-options";
 
@@ -44,37 +45,53 @@ export default function ChatTopbar({
   const hasMounted = useHasMounted();
 
   const currentModel = chatOptions && chatOptions.selectedModel;
+  const provider = chatOptions.provider ?? "vllm";
+  const apiBaseUrl = chatOptions.apiBaseUrl;
+  const apiKey = chatOptions.apiKey;
   const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
-  const [error, setError] = React.useState<string | undefined>(undefined);
-
-  const fetchData = async () => {
-    if (!hasMounted) {
-      return null;
-    }
-    try {
-      const res = await fetch(basePath + "/api/models");
-
-      if (!res.ok) {
-        const errorResponse = await res.json();
-        const errorMessage = `Connection to vLLM server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
-        throw new Error(errorMessage);
-      }
-
-      const data = await res.json();
-      // Extract the "name" field from each model object and store them in the state
-      const modelNames = data.data.map((model: any) => model.id);
-      // save the first and only model in the list as selectedModel in localstorage
-      setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
-    } catch (error) {
-      setChatOptions({ ...chatOptions, selectedModel: undefined });
-      toast.error(error as string);
-    }
-  };
 
   useEffect(() => {
+    if (!hasMounted) {
+      return;
+    }
+
+    const currentChatOptions: ChatOptions = {
+      provider,
+      apiBaseUrl,
+      apiKey,
+      selectedModel: currentModel,
+    };
+
+    const fetchData = async () => {
+      try {
+        const res = await fetch(basePath + "/api/models", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chatOptions: currentChatOptions }),
+        });
+
+        if (!res.ok) {
+          const errorResponse = await res.json();
+          const errorMessage = `Connection to ${providerLabels[provider]} server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
+          throw new Error(errorMessage);
+        }
+
+        const data = await res.json();
+        const modelNames = data.data.map((model: any) => model.id);
+        if (modelNames.length > 0 && !modelNames.includes(currentModel)) {
+          setChatOptions((prev) => ({ ...prev, selectedModel: modelNames[0] }));
+        }
+      } catch (error) {
+        if (!currentModel) {
+          setChatOptions((prev) => ({ ...prev, selectedModel: undefined }));
+        }
+        toast.error(error instanceof Error ? error.message : String(error));
+      }
+    };
+
     fetchData();
-    getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
-  }, [hasMounted]);
+    getTokenLimit(basePath, currentChatOptions).then((limit) => setTokenLimit(limit));
+  }, [hasMounted, provider, apiBaseUrl, apiKey, currentModel, setChatOptions]);
 
   if (!hasMounted) {
     return (
@@ -111,7 +128,7 @@ export default function ChatTopbar({
 
       <div className="flex justify-center md:justify-between gap-4 w-full">
         <div className="gap-1 flex items-center">
-          {currentModel !== undefined && (
+          {currentModel && (
             <>
               {isLoading ? (
                 <DotFilledIcon className="w-4 h-4 text-blue-500" />
@@ -138,10 +155,10 @@ export default function ChatTopbar({
               </span>
             </>
           )}
-          {currentModel === undefined && (
+          {!currentModel && (
             <>
               <CrossCircledIcon className="w-4 h-4 text-red-500" />
-              <span className="text-xs">Connection to vLLM server failed</span>
+              <span className="text-xs">Connection to {providerLabels[provider]} server failed</span>
             </>
           )}
         </div>

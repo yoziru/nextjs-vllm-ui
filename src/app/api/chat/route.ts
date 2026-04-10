@@ -10,9 +10,10 @@ import { createOpenAI } from "@ai-sdk/openai";
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 import { encodeChat } from "@/lib/token-counter";
+import { resolveLlmConfig } from "@/lib/server-llm-config";
 
 const addSystemMessage = (messages: CoreMessage[], systemPrompt?: string) => {
   // early exit if system prompt is empty
@@ -106,56 +107,41 @@ const formatMessages = (
 };
 
 export async function POST(req: Request) {
-  // export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { messages, chatOptions } = await req.json();
-    if (!chatOptions.selectedModel || chatOptions.selectedModel === "") {
+    const llmConfig = resolveLlmConfig(chatOptions);
+
+    if (!llmConfig.model || llmConfig.model === "") {
       throw new Error("Selected model is required");
     }
 
-    const baseUrl = process.env.VLLM_URL;
-    if (!baseUrl) {
-      throw new Error("VLLM_URL is not set");
-    }
-    const apiKey = process.env.VLLM_API_KEY;
-
-    const tokenLimit = process.env.VLLM_TOKEN_LIMIT
-      ? parseInt(process.env.VLLM_TOKEN_LIMIT)
-      : 4096;
-
     const formattedMessages = formatMessages(
       addSystemMessage(messages, chatOptions.systemPrompt),
-      tokenLimit
+      llmConfig.tokenLimit
     );
 
     // Call the language model
     const customOpenai = createOpenAI({
-      baseUrl: baseUrl + "/v1",
-      apiKey: apiKey ?? "",
+      baseUrl: llmConfig.openAIBaseUrl,
+      apiKey: llmConfig.apiKey ?? "",
     });
-    console.log("options", chatOptions);
 
     const result = await streamText({
-      model: customOpenai(chatOptions.selectedModel),
+      model: customOpenai(llmConfig.model),
       messages: formattedMessages,
       temperature: chatOptions.temperature,
       maxTokens: chatOptions.maxTokens,
       topP: chatOptions.topP,
-      topK: chatOptions.topK,
+      ...(llmConfig.provider !== "openai" ? { topK: chatOptions.topK } : {}),
       // repeat_Penalty: chatOptions.repeatPenalty,
       // async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
       //   // implement your own logic here, e.g. for storing messages
       //   // or recording token usage
       // },
     });
-    console.log("temperature", chatOptions.temperature);
-    console.log("maxTokens", chatOptions.maxTokens);
-    console.log("topP", chatOptions.topP);
-    console.log("topK", chatOptions.topK);
-    console.log("Penality_Repeat", chatOptions.repeatPenalty);
+
     // Respond with the stream
     return result.toAIStreamResponse();
-
   } catch (error) {
     console.error(error);
     return NextResponse.json(

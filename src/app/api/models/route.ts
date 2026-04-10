@@ -1,38 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
-  const baseUrl = process.env.VLLM_URL;
-  const apiKey = process.env.VLLM_API_KEY;
-  const headers = new Headers();
-  if (apiKey !== undefined) {
-    headers.set("Authorization", `Bearer ${apiKey}`);
-    headers.set("api-key", apiKey);
-  }
-  if (!baseUrl) {
-    throw new Error("VLLM_URL is not set");
-  }
+import { ChatOptions } from "@/components/chat/chat-options";
+import { getProviderHeaders, resolveLlmConfig } from "@/lib/server-llm-config";
 
-  const envModel = process.env.VLLM_MODEL;
-  if (envModel) {
+async function fetchModels(chatOptions?: Partial<ChatOptions>): Promise<NextResponse> {
+  const llmConfig = resolveLlmConfig(chatOptions);
+
+  if (llmConfig.model) {
     return NextResponse.json({
       object: "list",
       data: [
         {
-          id: envModel,
+          id: llmConfig.model,
         },
       ],
     });
   }
 
   try {
-    const res = await fetch(`${baseUrl}/v1/models`, {
-      headers: headers,
+    const res = await fetch(`${llmConfig.openAIBaseUrl}/models`, {
+      headers: getProviderHeaders(llmConfig.apiKey),
       cache: "no-store",
     });
     if (res.status !== 200) {
       const statusText = res.statusText;
       const responseBody = await res.text();
-      console.error(`vLLM /api/models response error: ${responseBody}`);
+      console.error(`${llmConfig.provider} /api/models response error: ${responseBody}`);
       return NextResponse.json(
         {
           success: false,
@@ -52,4 +45,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       { status: 500 }
     );
   }
+}
+
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  return fetchModels();
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  const body = await req.json().catch(() => ({}));
+  return fetchModels(body.chatOptions);
 }
