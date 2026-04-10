@@ -1,5 +1,7 @@
 # nextjs-vllm-ui
 
+Forked from https://github.com/jakobhoeg/nextjs-ollama-llm-ui
+
 <div align="center">
   <img src="ollama-nextjs-ui.gif">
 </div>
@@ -30,8 +32,8 @@ https://github.com/jakobhoeg/nextjs-ollama-llm-ui/assets/114422072/08eaed4f-9deb
 
 To use the web interface, these requisites must be met:
 
-1. Download [vLLM](https://docs.vllm.ai/en/latest/) and have it running. Or run it in a Docker container. 
-2. [Node.js](https://nodejs.org/en/download) (18+), [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) is required. 
+1. Download [vLLM](https://docs.vllm.ai/en/latest/) and have it running. Or run it in a Docker container.
+2. [Node.js](https://nodejs.org/en/download) (18+), [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) is required.
 
 # Usage 🚀
 
@@ -42,11 +44,13 @@ docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:8000 ghc
 ```
 
 If you're using Ollama, you need to set the `VLLM_MODEL`:
+
 ```
 docker run --rm -d -p 3000:3000 -e VLLM_URL=http://host.docker.internal:11434 -e VLLM_TOKEN_LIMIT=8192 -e VLLM_MODEL=llama3 ghcr.io/yoziru/nextjs-vllm-ui:latest
 ```
 
 If your server is running on a different IP address or port, you can use the `--network host` mode in Docker, e.g.:
+
 ```
 docker run --rm -d --network host -e VLLM_URL=http://192.1.0.110:11434 -e VLLM_TOKEN_LIMIT=8192 -e VLLM_MODEL=llama3 ghcr.io/yoziru/nextjs-vllm-ui:latest
 ```
@@ -58,42 +62,48 @@ Then go to [localhost:3000](http://localhost:3000) and start chatting with your 
 To install and run a local environment of the web interface, follow the instructions below.
 
 1. **Clone the repository to a directory on your pc via command prompt:**
-    ```
-    git clone https://github.com/yoziru/nextjs-vllm-ui
-    ```
+
+   ```
+   git clone https://github.com/yoziru/nextjs-vllm-ui
+   ```
 
 1. **Open the folder:**
-    ```
-    cd nextjs-vllm-ui
-    ```
+
+   ```
+   cd nextjs-vllm-ui
+   ```
 
 1. ** Rename the `.example.env` to `.env`:**
-    ```
-    mv .example.env .env
-    ```
+
+   ```
+   mv .example.env .env
+   ```
 
 1. **If your instance of vLLM is NOT running on the default ip-address and port, change the variable in the .env file to fit your usecase:**
-    ```
-    VLLM_URL="http://localhost:8000"
-    VLLM_API_KEY="your-api-key"
-    VLLM_MODEL="llama3:8b"
-    VLLM_TOKEN_LIMIT=4096
-    ```
+
+   ```
+   VLLM_URL="http://localhost:8000"
+   VLLM_API_KEY="your-api-key"
+   VLLM_MODEL="llama3:8b"
+   VLLM_TOKEN_LIMIT=4096
+   ```
 
 1. **Install dependencies:**
-    ```
-    yarn install
-    ```
+
+   ```
+   yarn install
+   ```
 
 1. **Start the development server:**
-    ```
-    yarn dev
-    ```
+
+   ```
+   yarn dev
+   ```
 
 1. **Go to [localhost:3000](http://localhost:3000) and start chatting with your favourite model!**
 
-
 You can also build and run the docker image locally with this command:
+
 ```sh
 docker build . -t ghcr.io/yoziru/nextjs-vllm-ui:latest \
  && docker run --rm \
