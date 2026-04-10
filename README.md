@@ -204,7 +204,6 @@ To install and run a local environment of the web interface, follow the instruct
    OSIRUS_URL="osirus.ai"
    OSIRUS_TOKEN="your-token"
    OSIRUS_AGENT_ID="your-agent-guid"
-   OSIRUS_MODEL=""
    OSIRUS_TOKEN_LIMIT=128000
    ```
 

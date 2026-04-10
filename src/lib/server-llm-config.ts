@@ -41,7 +41,7 @@ const providerEnv = {
   osirus: {
     url: "OSIRUS_URL",
     apiKey: "OSIRUS_TOKEN",
-    model: "OSIRUS_MODEL",
+    model: "",
     tokenLimit: "OSIRUS_TOKEN_LIMIT",
   },
   custom: {
@@ -121,7 +121,7 @@ export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig 
   const baseUrl = resolveBaseUrl(provider, env);
 
   const apiKey = process.env[env.apiKey];
-  const model = process.env[env.model] || chatOptions?.selectedModel;
+  const model = (env.model ? process.env[env.model] : undefined) || chatOptions?.selectedModel;
   const tokenLimit = readNumber(
     process.env[env.tokenLimit] || process.env.VLLM_TOKEN_LIMIT,
     4096
