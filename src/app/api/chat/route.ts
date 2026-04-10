@@ -15,6 +15,9 @@ import { NextResponse } from "next/server";
 import { encodeChat } from "@/lib/token-counter";
 import { resolveLlmConfig } from "@/lib/server-llm-config";
 
+const supportsTopK = (provider: string) =>
+  provider === "vllm" || provider === "ollama";
+
 const addSystemMessage = (messages: CoreMessage[], systemPrompt?: string) => {
   // early exit if system prompt is empty
   if (!systemPrompt || systemPrompt === "") {
@@ -132,7 +135,7 @@ export async function POST(req: Request) {
       temperature: chatOptions.temperature,
       maxTokens: chatOptions.maxTokens,
       topP: chatOptions.topP,
-      ...(llmConfig.provider !== "openai" ? { topK: chatOptions.topK } : {}),
+      ...(supportsTopK(llmConfig.provider) ? { topK: chatOptions.topK } : {}),
       // repeat_Penalty: chatOptions.repeatPenalty,
       // async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
       //   // implement your own logic here, e.g. for storing messages

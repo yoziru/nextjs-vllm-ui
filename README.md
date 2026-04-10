@@ -7,7 +7,7 @@ Forked from https://github.com/jakobhoeg/nextjs-ollama-llm-ui
 </div>
 
 <h1 align="center">
-  Fully-featured & beautiful web interface for vLLM, Ollama, OpenAI, and OpenAI-compatible APIs
+  Fully-featured & beautiful web interface for vLLM, Ollama, OpenAI, Osirus.AI, and OpenAI-compatible APIs
 </h1>
 
 Get up and running with Large Language Models **quickly**, **locally** and even **offline**.
@@ -18,7 +18,7 @@ This project aims to be the easiest way for you to get started with LLMs. No ted
 - **Beautiful & intuitive UI:** Inspired by ChatGPT, to enhance similarity in the user experience.
 - **Fully local:** Stores chats in localstorage for convenience. No need to run a database.
 - **Fully responsive:** Use your phone to chat, with the same ease as on desktop.
-- **Multiple providers:** Use vLLM, Ollama, OpenAI, or another OpenAI-compatible API with optional API-key auth.
+- **Multiple providers:** Use vLLM, Ollama, OpenAI, Osirus.AI, or another OpenAI-compatible API with optional token/API-key auth.
 - **Easy setup:** No tedious and annoying setup required. Just clone the repo and you're good to go!
 - **Code syntax highligting:** Messages that include code, will be highlighted for easy access.
 - **Copy codeblocks easily:** Easily copy the highlighted code with one click.
@@ -33,7 +33,7 @@ https://github.com/jakobhoeg/nextjs-ollama-llm-ui/assets/114422072/08eaed4f-9deb
 
 To use the web interface, these requisites must be met:
 
-1. Have a model provider available: [vLLM](https://docs.vllm.ai/en/latest/), Ollama's OpenAI-compatible API, OpenAI, or another OpenAI-compatible endpoint.
+1. Have a model provider available: [vLLM](https://docs.vllm.ai/en/latest/), Ollama's OpenAI-compatible API, OpenAI, Osirus.AI, or another OpenAI-compatible endpoint.
 2. [Node.js](https://nodejs.org/en/download) (18+), [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) is required.
 
 # Usage 🚀
@@ -59,6 +59,17 @@ docker run --rm -d -p 3000:3000 \
   ghcr.io/yoziru/nextjs-vllm-ui:latest
 ```
 
+For Osirus.AI, set your app URL, bearer token, and agent GUID:
+
+```sh
+docker run --rm -d -p 3000:3000 \
+  -e LLM_PROVIDER=osirus \
+  -e OSIRUS_URL=osirus.ai \
+  -e OSIRUS_TOKEN=your-token \
+  -e OSIRUS_AGENT_ID=your-agent-guid \
+  ghcr.io/yoziru/nextjs-vllm-ui:latest
+```
+
 Provider selection is environment-driven. Set `LLM_PROVIDER` in `.env` or Docker Compose and the app will use the matching server-side configuration.
 
 ## Docker Compose
@@ -79,6 +90,16 @@ This repo now includes a `docker-compose.yml` for local testing.
    LLM_PROVIDER="openai"
    OPENAI_API_KEY="sk-your-key"
    OPENAI_MODEL="gpt-4o-mini"
+   ```
+
+   Example for Osirus.AI:
+
+   ```sh
+   LLM_PROVIDER="osirus"
+   OSIRUS_URL="osirus.ai"
+   OSIRUS_TOKEN="your-token"
+   OSIRUS_AGENT_ID="your-agent-guid"
+   OSIRUS_TOKEN_LIMIT=128000
    ```
 
    Example for Ollama:
@@ -109,6 +130,7 @@ This repo now includes a `docker-compose.yml` for local testing.
 
 5. The app will use whichever provider is selected by `LLM_PROVIDER`:
    - `openai` for `OPENAI_*`
+   - `osirus` for `OSIRUS_*`
    - `ollama` for `OLLAMA_*`
    - `vllm` for `VLLM_*`
    - `custom` for `CUSTOM_OPENAI_*`
@@ -175,6 +197,17 @@ To install and run a local environment of the web interface, follow the instruct
    OPENAI_TOKEN_LIMIT=128000
    ```
 
+   Osirus.AI:
+
+   ```
+   LLM_PROVIDER="osirus"
+   OSIRUS_URL="osirus.ai"
+   OSIRUS_TOKEN="your-token"
+   OSIRUS_AGENT_ID="your-agent-guid"
+   OSIRUS_MODEL=""
+   OSIRUS_TOKEN_LIMIT=128000
+   ```
+
 1. **Install dependencies:**
 
    ```
@@ -201,11 +234,12 @@ Here is a simple manual test plan for provider support:
    - sending a prompt returns a streamed response
    - token counter still updates
 4. For OpenAI specifically, verify `LLM_PROVIDER="openai"` with `OPENAI_API_KEY` and `OPENAI_MODEL`.
-5. For a custom endpoint, verify `LLM_PROVIDER="custom"` and `CUSTOM_OPENAI_URL` work without manually appending `/v1`.
+5. For Osirus.AI specifically, verify `LLM_PROVIDER="osirus"` with `OSIRUS_URL`, `OSIRUS_TOKEN`, and `OSIRUS_AGENT_ID`.
+6. For a custom endpoint, verify `LLM_PROVIDER="custom"` and `CUSTOM_OPENAI_URL` work without manually appending `/v1`.
 
 Suggested PR notes:
 
-1. Added provider-aware chat/model/settings routing for `vllm`, `ollama`, `openai`, and custom OpenAI-compatible APIs.
+1. Added provider-aware chat/model/settings routing for `vllm`, `ollama`, `openai`, `osirus`, and custom OpenAI-compatible APIs.
 2. Switched provider selection to environment-driven configuration via `LLM_PROVIDER`.
 3. Added `.example.env` entries and Docker Compose support for local verification.
 4. Verified TypeScript with `tsc --noEmit` and lint with `next lint` without running a full production build.

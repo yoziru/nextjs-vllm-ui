@@ -38,6 +38,12 @@ const providerEnv = {
     model: "OPENAI_MODEL",
     tokenLimit: "OPENAI_TOKEN_LIMIT",
   },
+  osirus: {
+    url: "OSIRUS_URL",
+    apiKey: "OSIRUS_TOKEN",
+    model: "OSIRUS_MODEL",
+    tokenLimit: "OSIRUS_TOKEN_LIMIT",
+  },
   custom: {
     url: "CUSTOM_OPENAI_URL",
     apiKey: "CUSTOM_OPENAI_API_KEY",
@@ -58,11 +64,24 @@ function readNumber(value: string | undefined, fallback: number) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function withDefaultProtocol(provider: LlmProvider, value: string) {
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
+
+  if (provider === "vllm" || provider === "ollama") {
+    return `http://${value}`;
+  }
+
+  return `https://${value}`;
+}
+
 function parseProvider(value?: string): LlmProvider {
   switch (value) {
     case "vllm":
     case "ollama":
     case "openai":
+    case "osirus":
     case "custom":
       return value;
     default:
@@ -70,9 +89,7 @@ function parseProvider(value?: string): LlmProvider {
   }
 }
 
-export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig {
-  const provider = parseProvider(process.env.LLM_PROVIDER);
-  const env = providerEnv[provider];
+function resolveBaseUrl(provider: LlmProvider, env: (typeof providerEnv)[LlmProvider]) {
   const baseUrl =
     process.env[env.url] ||
     (provider === "ollama" ? process.env.VLLM_URL : undefined) ||
@@ -81,6 +98,27 @@ export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig 
   if (!baseUrl) {
     throw new Error(`${env.url} is not set`);
   }
+
+  return normalizeBaseUrl(withDefaultProtocol(provider, baseUrl));
+}
+
+function resolveOpenAIBaseUrl(provider: LlmProvider, baseUrl: string) {
+  if (provider !== "osirus") {
+    return toOpenAIBaseUrl(baseUrl);
+  }
+
+  const agentId = (process.env.OSIRUS_AGENT_ID || "").trim();
+  if (!agentId) {
+    throw new Error("OSIRUS_AGENT_ID is not set");
+  }
+
+  return `${baseUrl}/api/agents/${agentId}/v1`;
+}
+
+export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig {
+  const provider = parseProvider(process.env.LLM_PROVIDER);
+  const env = providerEnv[provider];
+  const baseUrl = resolveBaseUrl(provider, env);
 
   const apiKey = process.env[env.apiKey];
   const model = process.env[env.model] || chatOptions?.selectedModel;
@@ -92,8 +130,8 @@ export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig 
   const config = {
     provider,
     providerLabel: providerLabels[provider],
-    baseUrl: normalizeBaseUrl(baseUrl),
-    openAIBaseUrl: toOpenAIBaseUrl(baseUrl),
+    baseUrl,
+    openAIBaseUrl: resolveOpenAIBaseUrl(provider, baseUrl),
     apiKey,
     model,
     tokenLimit,
