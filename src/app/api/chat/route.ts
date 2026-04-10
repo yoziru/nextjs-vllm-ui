@@ -18,6 +18,20 @@ import { resolveLlmConfig } from "@/lib/server-llm-config";
 const supportsTopK = (provider: string) =>
   provider === "vllm" || provider === "ollama";
 
+const resolveModelId = (provider: string, model?: string) => {
+  const trimmedModel = model?.trim();
+  if (trimmedModel) {
+    return trimmedModel;
+  }
+
+  // Osirus routes by agent id and does not require a caller-provided model id.
+  if (provider === "osirus") {
+    return "osirus-default";
+  }
+
+  return undefined;
+};
+
 const addSystemMessage = (messages: CoreMessage[], systemPrompt?: string) => {
   // early exit if system prompt is empty
   if (!systemPrompt || systemPrompt === "") {
@@ -113,8 +127,9 @@ export async function POST(req: Request) {
   try {
     const { messages, chatOptions } = await req.json();
     const llmConfig = resolveLlmConfig(chatOptions);
+    const modelId = resolveModelId(llmConfig.provider, llmConfig.model);
 
-    if (!llmConfig.model || llmConfig.model === "") {
+    if (!modelId) {
       throw new Error("Selected model is required");
     }
 
@@ -130,7 +145,7 @@ export async function POST(req: Request) {
     });
 
     const result = await streamText({
-      model: customOpenai(llmConfig.model),
+      model: customOpenai(modelId),
       messages: formattedMessages,
       temperature: chatOptions.temperature,
       maxTokens: chatOptions.maxTokens,

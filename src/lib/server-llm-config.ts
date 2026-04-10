@@ -92,6 +92,7 @@ function parseProvider(value?: string): LlmProvider {
 function resolveBaseUrl(provider: LlmProvider, env: (typeof providerEnv)[LlmProvider]) {
   const baseUrl =
     process.env[env.url] ||
+    (provider === "osirus" ? process.env.OSIRUS_BASE_URL : undefined) ||
     (provider === "ollama" ? process.env.VLLM_URL : undefined) ||
     defaultProviderBaseUrls[provider];
 
@@ -112,15 +113,18 @@ function resolveOpenAIBaseUrl(provider: LlmProvider, baseUrl: string) {
     throw new Error("OSIRUS_AGENT_ID is not set");
   }
 
-  return `${baseUrl}/api/agents/${agentId}/v1`;
+  const osirusApiBaseUrl = baseUrl.endsWith("/api") ? baseUrl : `${baseUrl}/api`;
+  return `${osirusApiBaseUrl}/agents/${agentId}/v1`;
 }
 
 export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig {
-  const provider = parseProvider(process.env.LLM_PROVIDER);
+  const provider = parseProvider(chatOptions?.provider || process.env.LLM_PROVIDER);
   const env = providerEnv[provider];
   const baseUrl = resolveBaseUrl(provider, env);
 
-  const apiKey = process.env[env.apiKey];
+  const apiKey =
+    process.env[env.apiKey] ||
+    (provider === "osirus" ? process.env.OSIRUS_API_TOKEN : undefined);
   const model = (env.model ? process.env[env.model] : undefined) || chatOptions?.selectedModel;
   const tokenLimit = readNumber(
     process.env[env.tokenLimit] || process.env.VLLM_TOKEN_LIMIT,

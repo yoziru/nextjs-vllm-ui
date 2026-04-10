@@ -17,6 +17,19 @@ interface ChatPageProps {
   setChatId: React.Dispatch<React.SetStateAction<string>>;
 }
 export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
+  const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
+    "chatOptions",
+    {
+      defaultValue: {
+        selectedModel: "",
+        systemPrompt: "",
+        temperature: 0.9,
+      },
+    }
+  );
+
+  const streamMode = chatOptions?.provider === "osirus" ? "text" : "stream-data";
+
   const {
     messages,
     input,
@@ -28,21 +41,11 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
     setMessages,
   } = useChat({
     api: basePath + "/api/chat",
-    streamMode: "stream-data",
+    streamMode,
     onError: (error) => {
       toast.error("Something went wrong: " + error);
     },
   });
-  const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
-    "chatOptions",
-    {
-      defaultValue: {
-        selectedModel: "",
-        systemPrompt: "",
-        temperature: 0.9,
-      },
-    }
-  );
 
   React.useEffect(() => {
     if (chatId) {

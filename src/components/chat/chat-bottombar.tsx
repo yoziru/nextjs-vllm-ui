@@ -9,9 +9,11 @@ import TextareaAutosize from "react-textarea-autosize";
 
 import { basePath, useHasMounted } from "@/lib/utils";
 import { getTokenLimit } from "@/lib/token-counter";
+import { LlmProvider } from "@/lib/llm-providers";
 import { Button } from "../ui/button";
 
 interface ChatBottombarProps {
+  provider?: LlmProvider;
   selectedModel: string | undefined;
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -24,6 +26,7 @@ interface ChatBottombarProps {
 }
 
 export default function ChatBottombar({
+  provider,
   selectedModel,
   input,
   handleInputChange,
@@ -33,7 +36,8 @@ export default function ChatBottombar({
 }: ChatBottombarProps) {
   const hasMounted = useHasMounted();
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
-  const hasSelectedModel = selectedModel && selectedModel !== "";
+  const hasSelectedModel =
+    provider === "osirus" || (selectedModel && selectedModel !== "");
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && hasSelectedModel && !isLoading) {
@@ -44,8 +48,10 @@ export default function ChatBottombar({
 
   const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
   React.useEffect(() => {
-    getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
-  }, [hasMounted]);
+    getTokenLimit(basePath, provider ? { provider } : undefined).then((limit) =>
+      setTokenLimit(limit)
+    );
+  }, [hasMounted, provider]);
 
   const tokenCount = React.useMemo(
     () => (input ? llama3Tokenizer.encode(input).length - 1 : 0),
