@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@radix-ui/react-dialog";
-import { TrashIcon } from "@radix-ui/react-icons";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { useHasMounted } from "@/lib/utils";
@@ -18,7 +18,6 @@ import { DialogHeader } from "./ui/dialog";
 export default function ClearChatsButton() {
   const hasMounted = useHasMounted();
   const router = useRouter();
-
   if (!hasMounted) {
     return null;
   }
@@ -40,17 +39,16 @@ export default function ClearChatsButton() {
   return (
     <Dialog>
       <DialogTrigger
-        className="inline-flex items-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 rounded-sm px-3 text-xs justify-start gap-2 w-full"
+        className="inline-flex items-center text-gray-500 hover:text-gray-700 font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-8 rounded-sm px-3 text-xs justify-start gap-2 w-full"
         disabled={disabled}
       >
-        <TrashIcon className="w-4 h-4" />
+        <Trash2 className="w-4 h-4" />
         <span>Clear chats</span>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader className="space-y-2">
           <DialogDescription className="text-xs">
-            Are you sure you want to delete all chats? This action cannot be
-            undone.
+            Are you sure you want to delete all chats? This action cannot be undone.
           </DialogDescription>
           <div className="flex justify-end gap-2">
             <DialogClose className="border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-sm text-xs">

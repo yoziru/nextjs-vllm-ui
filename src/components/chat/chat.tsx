@@ -58,6 +58,7 @@ export default function Chat({
       />
 
       <ChatBottombar
+        provider={chatOptions.provider}
         selectedModel={chatOptions.selectedModel}
         input={input}
         handleInputChange={handleInputChange}

@@ -19,7 +19,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { encodeChat, getTokenLimit } from "@/lib/token-counter";
+import { encodeChat, getAppSettings } from "@/lib/token-counter";
+import { LlmProvider, LLM_PROVIDERS, providerLabels } from "@/lib/llm-providers";
 import { basePath, useHasMounted } from "@/lib/utils";
 import { Sidebar } from "../sidebar";
 import { ChatOptions } from "./chat-options";
@@ -43,38 +44,66 @@ export default function ChatTopbar({
 }: ChatTopbarProps) {
   const hasMounted = useHasMounted();
 
+  const currentProvider = chatOptions?.provider;
   const currentModel = chatOptions && chatOptions.selectedModel;
   const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
-  const [error, setError] = React.useState<string | undefined>(undefined);
-
-  const fetchData = async () => {
-    if (!hasMounted) {
-      return null;
-    }
-    try {
-      const res = await fetch(basePath + "/api/models");
-
-      if (!res.ok) {
-        const errorResponse = await res.json();
-        const errorMessage = `Connection to vLLM server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
-        throw new Error(errorMessage);
-      }
-
-      const data = await res.json();
-      // Extract the "name" field from each model object and store them in the state
-      const modelNames = data.data.map((model: any) => model.id);
-      // save the first and only model in the list as selectedModel in localstorage
-      setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
-    } catch (error) {
-      setChatOptions({ ...chatOptions, selectedModel: undefined });
-      toast.error(error as string);
-    }
-  };
+  const [activeProvider, setActiveProvider] = React.useState<string>("vllm");
+  const [providerLabel, setProviderLabel] = React.useState<string>("Model");
 
   useEffect(() => {
+    if (!hasMounted) {
+      return;
+    }
+
+    const currentChatOptions: ChatOptions = {
+      provider: currentProvider,
+      selectedModel: currentModel,
+    };
+
+    const fetchData = async () => {
+      try {
+        const [res, settings] = await Promise.all([
+          fetch(basePath + "/api/models", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chatOptions: currentChatOptions }),
+          }),
+          getAppSettings(basePath, currentChatOptions),
+        ]);
+
+        // Update active provider metadata even when model listing is unavailable.
+        setProviderLabel(settings.providerLabel);
+        setActiveProvider(settings.provider);
+
+        if (!res.ok) {
+          // Osirus can work without an explicit model list/model id.
+          if (settings.provider === "osirus") {
+            return;
+          }
+
+          const errorResponse = await res.json();
+          const errorMessage = `Connection to ${settings.providerLabel} server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
+          throw new Error(errorMessage);
+        }
+        setTokenLimit(settings.tokenLimit);
+
+        const data = await res.json();
+        const modelNames = Array.isArray(data?.data)
+          ? data.data.map((model: any) => model.id)
+          : [];
+        if (modelNames.length > 0 && !modelNames.includes(currentModel)) {
+          setChatOptions((prev) => ({ ...prev, selectedModel: modelNames[0] }));
+        }
+      } catch (error) {
+        if (!currentModel) {
+          setChatOptions((prev) => ({ ...prev, selectedModel: undefined }));
+        }
+        toast.error(error instanceof Error ? error.message : String(error));
+      }
+    };
+
     fetchData();
-    getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
-  }, [hasMounted]);
+  }, [hasMounted, currentProvider, currentModel, setChatOptions]);
 
   if (!hasMounted) {
     return (
@@ -86,6 +115,8 @@ export default function ChatTopbar({
   }
 
   const chatTokens = messages.length > 0 ? encodeChat(messages) : 0;
+  const providerRequiresModel = activeProvider !== "osirus";
+  const isProviderReady = !providerRequiresModel || Boolean(currentModel);
 
   return (
     <div className="md:w-full flex px-4 py-4 items-center justify-between md:justify-center">
@@ -111,7 +142,26 @@ export default function ChatTopbar({
 
       <div className="flex justify-center md:justify-between gap-4 w-full">
         <div className="gap-1 flex items-center">
-          {currentModel !== undefined && (
+          <select
+            className="h-7 text-xs rounded-sm border border-input bg-background px-2 mr-2"
+            value={currentProvider || activeProvider}
+            onChange={(e) =>
+              setChatOptions((prev) => ({
+                ...prev,
+                provider: (e.target.value || undefined) as LlmProvider | undefined,
+                selectedModel: undefined,
+              }))
+            }
+            title="Provider"
+          >
+            <option value="">Default</option>
+            {LLM_PROVIDERS.map((provider) => (
+              <option key={provider} value={provider}>
+                {providerLabels[provider]}
+              </option>
+            ))}
+          </select>
+          {isProviderReady && (
             <>
               {isLoading ? (
                 <DotFilledIcon className="w-4 h-4 text-blue-500" />
@@ -128,7 +178,7 @@ export default function ChatTopbar({
                       className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-2 rounded-sm text-xs"
                     >
                       <p className="font-bold">Current Model</p>
-                      <p className="text-gray-500">{currentModel}</p>
+                      <p className="text-gray-500">{currentModel || "Provider-managed"}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -138,10 +188,10 @@ export default function ChatTopbar({
               </span>
             </>
           )}
-          {currentModel === undefined && (
+          {!isProviderReady && (
             <>
               <CrossCircledIcon className="w-4 h-4 text-red-500" />
-              <span className="text-xs">Connection to vLLM server failed</span>
+              <span className="text-xs">Connection to {providerLabel} server failed</span>
             </>
           )}
         </div>

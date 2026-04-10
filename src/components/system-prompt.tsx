@@ -35,10 +35,7 @@ export default function SystemPrompt({
 
   return (
     <div>
-      <div className="justify-start gap-2 w-full rounded-sm px-2 text-xs">
-        <p>System prompt</p>
-      </div>
-
+      <h3 className="text-lg font-semibold tracking-tight mb-2 px-2">System prompt</h3>
       <div className="m-2">
         <Textarea
           className="resize-none bg-white/20 dark:bg-card/35"
@@ -52,4 +49,4 @@ export default function SystemPrompt({
       </div>
     </div>
   );
-}
+}  

@@ -93,3 +93,14 @@
   height: 0;
   visibility: hidden;
 }
+/* Remove number input steppers (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove number input steppers (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
