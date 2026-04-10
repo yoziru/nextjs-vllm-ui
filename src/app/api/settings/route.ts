@@ -4,10 +4,12 @@ import { ChatOptions } from "@/components/chat/chat-options";
 import { resolveLlmConfig } from "@/lib/server-llm-config";
 
 function settingsResponse(chatOptions?: Partial<ChatOptions>) {
-  const tokenLimit = resolveLlmConfig(chatOptions).tokenLimit;
+  const llmConfig = resolveLlmConfig(chatOptions);
   return NextResponse.json(
     {
-      tokenLimit: tokenLimit,
+      provider: llmConfig.provider,
+      providerLabel: llmConfig.providerLabel,
+      tokenLimit: llmConfig.tokenLimit,
     },
     { status: 200 }
   );

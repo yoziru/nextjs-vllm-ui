@@ -3,7 +3,18 @@ import llama3Tokenizer from "llama3-tokenizer-js";
 
 import { ChatOptions } from "@/components/chat/chat-options";
 
+export interface AppSettings {
+  provider: string;
+  providerLabel: string;
+  tokenLimit: number;
+}
+
 export const getTokenLimit = async (basePath: string, chatOptions?: ChatOptions) => {
+  const settings = await getAppSettings(basePath, chatOptions);
+  return settings.tokenLimit;
+};
+
+export const getAppSettings = async (basePath: string, chatOptions?: ChatOptions) => {
   const res = await fetch(basePath + "/api/settings", {
     method: chatOptions ? "POST" : "GET",
     headers: chatOptions ? { "Content-Type": "application/json" } : undefined,
@@ -16,7 +27,7 @@ export const getTokenLimit = async (basePath: string, chatOptions?: ChatOptions)
     throw new Error(errorMessage);
   }
   const data = await res.json();
-  return data.tokenLimit;
+  return data as AppSettings;
 };
 
 export const encodeChat = (messages: Message[] | CoreMessage[]): number => {

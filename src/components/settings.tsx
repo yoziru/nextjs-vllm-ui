@@ -7,15 +7,8 @@ import ClearChatsButton from "./settings-clear-chats";
 import SettingsThemeToggle from "./settings-theme-toggle";
 import SystemPrompt, { SystemPromptProps } from "./system-prompt";
 import Accordion from "./ui/Accordion";
-import {
-  defaultProviderBaseUrls,
-  LLM_PROVIDERS,
-  providerLabels,
-} from "@/lib/llm-providers";
 
 export default function SettingsContainer({ chatOptions, setChatOptions }: SystemPromptProps) {
-  const provider = chatOptions.provider ?? "vllm";
-
   return (
     <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-4 m-0">
       <div className="border border-transparent rounded-lg p-0.5 m-0">
@@ -23,90 +16,6 @@ export default function SettingsContainer({ chatOptions, setChatOptions }: Syste
         <SystemPrompt chatOptions={chatOptions} setChatOptions={setChatOptions} />
 
         <div className="accordion accordion-flush p-0 m-0" id="accordionFlushExample">
-          <Accordion title="Provider">
-            <div className="flex flex-col gap-3 p-0 m-0">
-              <label className="text-sm font-medium p-0 m-0">Model Provider</label>
-              <select
-                value={provider}
-                onChange={(e) => {
-                  const nextProvider = e.target.value as typeof provider;
-                  setChatOptions({
-                    ...chatOptions,
-                    provider: nextProvider,
-                    selectedModel: "",
-                    apiBaseUrl:
-                      nextProvider === "custom" ? "" : defaultProviderBaseUrls[nextProvider],
-                  });
-                }}
-                className="h-9 w-full rounded-sm border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-              >
-                {LLM_PROVIDERS.map((providerKey) => (
-                  <option key={providerKey} value={providerKey}>
-                    {providerLabels[providerKey]}
-                  </option>
-                ))}
-              </select>
-
-              <div className="flex flex-col gap-1 p-0 m-0">
-                <label className="text-sm font-medium p-0 m-0">Base URL</label>
-                <Input
-                  type="url"
-                  value={chatOptions.apiBaseUrl ?? ""}
-                  placeholder={defaultProviderBaseUrls[provider] || "https://your-server.example.com"}
-                  onChange={(e) =>
-                    setChatOptions({
-                      ...chatOptions,
-                      apiBaseUrl: e.target.value,
-                      selectedModel: "",
-                    })
-                  }
-                />
-                <p className="text-xs text-gray-500">
-                  Use the server root URL. The app adds <code>/v1</code> automatically when needed.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-1 p-0 m-0">
-                <label className="text-sm font-medium p-0 m-0">API Key</label>
-                <Input
-                  type="password"
-                  value={chatOptions.apiKey ?? ""}
-                  placeholder={
-                    provider === "openai"
-                      ? "sk-..."
-                      : "Optional if your endpoint does not require one"
-                  }
-                  onChange={(e) =>
-                    setChatOptions({
-                      ...chatOptions,
-                      apiKey: e.target.value,
-                      selectedModel: "",
-                    })
-                  }
-                />
-                <p className="text-xs text-gray-500">
-                  Browser-entered keys are stored locally. Prefer server env vars for shared deployments.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-1 p-0 m-0">
-                <label className="text-sm font-medium p-0 m-0">Model</label>
-                <Input
-                  value={chatOptions.selectedModel ?? ""}
-                  placeholder={
-                    provider === "openai" ? "gpt-4o-mini" : "Auto-detected or type a model name"
-                  }
-                  onChange={(e) =>
-                    setChatOptions({
-                      ...chatOptions,
-                      selectedModel: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-          </Accordion>
-
           <Accordion title="Settings">
             {/* Temperature */}
             <div className="flex items-center gap-4 p-0 m-0">

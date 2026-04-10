@@ -9,6 +9,7 @@ services:
     env_file:
       - .env
     environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-vllm}
       VLLM_URL: ${VLLM_URL:-}
       VLLM_API_KEY: ${VLLM_API_KEY:-}
       VLLM_MODEL: ${VLLM_MODEL:-}

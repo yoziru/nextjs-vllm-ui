@@ -2,18 +2,22 @@ import { ChatOptions } from "@/components/chat/chat-options";
 import {
   defaultProviderBaseUrls,
   LlmProvider,
+  providerLabels,
   normalizeBaseUrl,
   toOpenAIBaseUrl,
 } from "@/lib/llm-providers";
 
 export interface LlmConfig {
   provider: LlmProvider;
+  providerLabel: string;
   baseUrl: string;
   openAIBaseUrl: string;
   apiKey?: string;
   model?: string;
   tokenLimit: number;
 }
+
+let hasLoggedLlmConfig = false;
 
 const providerEnv = {
   vllm: {
@@ -54,11 +58,22 @@ function readNumber(value: string | undefined, fallback: number) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function parseProvider(value?: string): LlmProvider {
+  switch (value) {
+    case "vllm":
+    case "ollama":
+    case "openai":
+    case "custom":
+      return value;
+    default:
+      return "vllm";
+  }
+}
+
 export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig {
-  const provider = chatOptions?.provider ?? "vllm";
+  const provider = parseProvider(process.env.LLM_PROVIDER);
   const env = providerEnv[provider];
   const baseUrl =
-    chatOptions?.apiBaseUrl ||
     process.env[env.url] ||
     (provider === "ollama" ? process.env.VLLM_URL : undefined) ||
     defaultProviderBaseUrls[provider];
@@ -67,21 +82,37 @@ export function resolveLlmConfig(chatOptions?: Partial<ChatOptions>): LlmConfig 
     throw new Error(`${env.url} is not set`);
   }
 
-  const apiKey = chatOptions?.apiKey || process.env[env.apiKey];
-  const model = chatOptions?.selectedModel || process.env[env.model];
+  const apiKey = process.env[env.apiKey];
+  const model = process.env[env.model] || chatOptions?.selectedModel;
   const tokenLimit = readNumber(
     process.env[env.tokenLimit] || process.env.VLLM_TOKEN_LIMIT,
     4096
   );
 
-  return {
+  const config = {
     provider,
+    providerLabel: providerLabels[provider],
     baseUrl: normalizeBaseUrl(baseUrl),
     openAIBaseUrl: toOpenAIBaseUrl(baseUrl),
     apiKey,
     model,
     tokenLimit,
   };
+
+  if (!hasLoggedLlmConfig) {
+    hasLoggedLlmConfig = true;
+    console.log("[llm] resolved provider config", {
+      provider: config.provider,
+      providerLabel: config.providerLabel,
+      baseUrl: config.baseUrl,
+      openAIBaseUrl: config.openAIBaseUrl,
+      model: config.model ?? null,
+      tokenLimit: config.tokenLimit,
+      hasApiKey: Boolean(config.apiKey),
+    });
+  }
+
+  return config;
 }
 
 export function getProviderHeaders(apiKey?: string) {

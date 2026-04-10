@@ -19,9 +19,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { encodeChat, getTokenLimit } from "@/lib/token-counter";
+import { encodeChat, getAppSettings } from "@/lib/token-counter";
 import { basePath, useHasMounted } from "@/lib/utils";
-import { providerLabels } from "@/lib/llm-providers";
 import { Sidebar } from "../sidebar";
 import { ChatOptions } from "./chat-options";
 
@@ -45,10 +44,8 @@ export default function ChatTopbar({
   const hasMounted = useHasMounted();
 
   const currentModel = chatOptions && chatOptions.selectedModel;
-  const provider = chatOptions.provider ?? "vllm";
-  const apiBaseUrl = chatOptions.apiBaseUrl;
-  const apiKey = chatOptions.apiKey;
   const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
+  const [providerLabel, setProviderLabel] = React.useState<string>("Model");
 
   useEffect(() => {
     if (!hasMounted) {
@@ -56,25 +53,23 @@ export default function ChatTopbar({
     }
 
     const currentChatOptions: ChatOptions = {
-      provider,
-      apiBaseUrl,
-      apiKey,
       selectedModel: currentModel,
     };
 
     const fetchData = async () => {
       try {
-        const res = await fetch(basePath + "/api/models", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chatOptions: currentChatOptions }),
-        });
-
+        const [res, settings] = await Promise.all([
+          fetch(basePath + "/api/models"),
+          getAppSettings(basePath, currentChatOptions),
+        ]);
         if (!res.ok) {
           const errorResponse = await res.json();
-          const errorMessage = `Connection to ${providerLabels[provider]} server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
+          const errorMessage = `Connection to ${settings.providerLabel} server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
           throw new Error(errorMessage);
         }
+
+        setProviderLabel(settings.providerLabel);
+        setTokenLimit(settings.tokenLimit);
 
         const data = await res.json();
         const modelNames = data.data.map((model: any) => model.id);
@@ -90,8 +85,7 @@ export default function ChatTopbar({
     };
 
     fetchData();
-    getTokenLimit(basePath, currentChatOptions).then((limit) => setTokenLimit(limit));
-  }, [hasMounted, provider, apiBaseUrl, apiKey, currentModel, setChatOptions]);
+  }, [hasMounted, currentModel, setChatOptions]);
 
   if (!hasMounted) {
     return (
@@ -158,7 +152,7 @@ export default function ChatTopbar({
           {!currentModel && (
             <>
               <CrossCircledIcon className="w-4 h-4 text-red-500" />
-              <span className="text-xs">Connection to {providerLabels[provider]} server failed</span>
+              <span className="text-xs">Connection to {providerLabel} server failed</span>
             </>
           )}
         </div>

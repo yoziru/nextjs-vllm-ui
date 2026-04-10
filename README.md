@@ -59,7 +59,7 @@ docker run --rm -d -p 3000:3000 \
   ghcr.io/yoziru/nextjs-vllm-ui:latest
 ```
 
-You can also choose the provider, base URL, API key, and model in the Settings panel. Server-side environment variables are safer for shared deployments; browser-entered API keys are stored in that browser's localStorage.
+Provider selection is environment-driven. Set `LLM_PROVIDER` in `.env` or Docker Compose and the app will use the matching server-side configuration.
 
 ## Docker Compose
 
@@ -71,11 +71,12 @@ This repo now includes a `docker-compose.yml` for local testing.
    cp .example.env .env
    ```
 
-2. Set the provider variables you want to test in `.env`.
+2. Set `LLM_PROVIDER` and the matching provider variables in `.env`.
 
    Example for OpenAI:
 
    ```sh
+   LLM_PROVIDER="openai"
    OPENAI_API_KEY="sk-your-key"
    OPENAI_MODEL="gpt-4o-mini"
    ```
@@ -83,6 +84,7 @@ This repo now includes a `docker-compose.yml` for local testing.
    Example for Ollama:
 
    ```sh
+   LLM_PROVIDER="ollama"
    OLLAMA_URL="http://host.docker.internal:11434"
    OLLAMA_MODEL="llama3"
    OLLAMA_TOKEN_LIMIT=8192
@@ -91,6 +93,7 @@ This repo now includes a `docker-compose.yml` for local testing.
    Example for vLLM:
 
    ```sh
+   LLM_PROVIDER="vllm"
    VLLM_URL="http://host.docker.internal:8000"
    VLLM_MODEL="meta-llama/Llama-3.1-8B-Instruct"
    VLLM_TOKEN_LIMIT=8192
@@ -104,11 +107,11 @@ This repo now includes a `docker-compose.yml` for local testing.
 
 4. Open `http://localhost:3000`.
 
-5. In Settings, choose the provider you want to use:
-   - `OpenAI` for `OPENAI_*`
-   - `Ollama` for `OLLAMA_*`
-   - `vLLM` for `VLLM_*`
-   - `OpenAI-compatible` for `CUSTOM_OPENAI_*` or a manual endpoint
+5. The app will use whichever provider is selected by `LLM_PROVIDER`:
+   - `openai` for `OPENAI_*`
+   - `ollama` for `OLLAMA_*`
+   - `vllm` for `VLLM_*`
+   - `custom` for `CUSTOM_OPENAI_*`
 
 If you are connecting from Docker to a service running on your host machine, `host.docker.internal` is usually the right hostname on Docker Desktop.
 
@@ -144,16 +147,29 @@ To install and run a local environment of the web interface, follow the instruct
 
 1. **Configure your provider in `.env`:**
 
+   vLLM:
+
    ```
+   LLM_PROVIDER="vllm"
    VLLM_URL="http://localhost:8000"
    VLLM_API_KEY="your-api-key"
    VLLM_MODEL="llama3:8b"
    VLLM_TOKEN_LIMIT=4096
+   ```
 
+   Ollama:
+
+   ```
+   LLM_PROVIDER="ollama"
    OLLAMA_URL="http://localhost:11434"
    OLLAMA_MODEL="llama3"
    OLLAMA_TOKEN_LIMIT=8192
+   ```
 
+   OpenAI:
+
+   ```
+   LLM_PROVIDER="openai"
    OPENAI_API_KEY="sk-your-key"
    OPENAI_MODEL="gpt-4o-mini"
    OPENAI_TOKEN_LIMIT=128000
@@ -178,21 +194,19 @@ To install and run a local environment of the web interface, follow the instruct
 Here is a simple manual test plan for provider support:
 
 1. Start the UI with `docker compose up --build` or `yarn dev`.
-2. Open Settings and verify you can switch between `vLLM`, `Ollama`, `OpenAI`, and `OpenAI-compatible`.
+2. Set `LLM_PROVIDER` to the provider you want to test and restart the app.
 3. For each provider you care about, confirm:
    - model list loads successfully
    - selected model persists in the UI
    - sending a prompt returns a streamed response
    - token counter still updates
-4. For OpenAI specifically, test both:
-   - server-side env vars like `OPENAI_API_KEY`
-   - browser-entered API key and model in Settings
-5. For a custom endpoint, verify the base URL works when entered without manually appending `/v1`.
+4. For OpenAI specifically, verify `LLM_PROVIDER="openai"` with `OPENAI_API_KEY` and `OPENAI_MODEL`.
+5. For a custom endpoint, verify `LLM_PROVIDER="custom"` and `CUSTOM_OPENAI_URL` work without manually appending `/v1`.
 
 Suggested PR notes:
 
 1. Added provider-aware chat/model/settings routing for `vllm`, `ollama`, `openai`, and custom OpenAI-compatible APIs.
-2. Added provider configuration fields in Settings for base URL, API key, and model selection.
+2. Switched provider selection to environment-driven configuration via `LLM_PROVIDER`.
 3. Added `.example.env` entries and Docker Compose support for local verification.
 4. Verified TypeScript with `tsc --noEmit` and lint with `next lint` without running a full production build.
 

@@ -1,10 +1,5 @@
-import { LlmProvider } from "@/lib/llm-providers";
-
 export interface ChatOptions {
-  provider?: LlmProvider;
   selectedModel?: string;
-  apiBaseUrl?: string;
-  apiKey?: string;
   systemPrompt?: string;
   temperature?: number;
   maxTokens?: number;
