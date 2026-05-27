@@ -11,7 +11,6 @@ overrides:
 time:
   '@ai-sdk/openai@2.0.106': 2026-05-01T15:59:35.650Z
   '@ai-sdk/react@2.0.192': 2026-05-19T21:02:57.135Z
-  '@hookform/resolvers@3.10.0': 2025-01-06T22:28:07.879Z
   '@opentelemetry/api@1.9.0': 2024-06-05T17:15:25.003Z
   '@radix-ui/react-dialog@1.1.12': 2025-05-05T18:04:56.375Z
   '@radix-ui/react-icons@1.3.2': 2024-11-14T20:05:36.614Z
@@ -33,7 +32,6 @@ time:
   postcss@8.5.15: 2026-05-19T09:51:29.843Z
   react-code-blocks@0.1.6: 2024-01-18T23:16:45.579Z
   react-dom@18.3.1: 2024-04-26T16:42:49.931Z
-  react-hook-form@7.56.2: 2025-05-03T22:42:36.424Z
   react-markdown@9.1.0: 2025-02-20T11:57:00.191Z
   react-textarea-autosize@8.5.9: 2025-03-30T22:13:11.081Z
   react@18.3.1: 2024-04-26T16:42:26.496Z
@@ -58,9 +56,6 @@ importers:
       '@ai-sdk/react':
         specifier: 2.0.192
         version: 2.0.192(react@18.3.1)(zod@3.25.76)
-      '@hookform/resolvers':
-        specifier: 3.10.0
-        version: 3.10.0(react-hook-form@7.56.2(react@18.3.1))
       '@opentelemetry/api':
         specifier: ^1.1.0
         version: 1.9.0
@@ -106,9 +101,6 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
-      react-hook-form:
-        specifier: 7.56.2
-        version: 7.56.2(react@18.3.1)
       react-markdown:
         specifier: 9.1.0
         version: 9.1.0(@types/react@18.3.20)(react@18.3.1)
@@ -248,11 +240,6 @@ packages:
 
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
-
-  '@hookform/resolvers@3.10.0':
-    resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
-    peerDependencies:
-      react-hook-form: ^7.0.0
 
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
@@ -2329,12 +2316,6 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
-  react-hook-form@7.56.2:
-    resolution: {integrity: sha512-vpfuHuQMF/L6GpuQ4c3ZDo+pRYxIi40gQqsCmmfUBwm+oqvBhKhwghCuj2o00YCgSfU6bR9KC/xnQGWm3Gr08A==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      react: ^16.8.0 || ^17 || ^18 || ^19
-
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -2966,10 +2947,6 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
 
   '@floating-ui/utils@0.2.11': {}
-
-  '@hookform/resolvers@3.10.0(react-hook-form@7.56.2(react@18.3.1))':
-    dependencies:
-      react-hook-form: 7.56.2(react@18.3.1)
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -5204,10 +5181,6 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
-
-  react-hook-form@7.56.2(react@18.3.1):
-    dependencies:
-      react: 18.3.1
 
   react-is@16.13.1: {}
 
