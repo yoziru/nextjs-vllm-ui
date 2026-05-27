@@ -2,11 +2,9 @@
 
 import React from "react";
 
-import { ChatRequestOptions } from "ai";
-import { useChat } from "ai/react";
+import { ChatRequestOptions, DefaultChatTransport } from "ai";
+import { useChat } from "@ai-sdk/react";
 import { toast } from "sonner";
-import useLocalStorageState from "use-local-storage-state";
-import { v4 as uuidv4 } from "uuid";
 
 import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatOptions } from "@/components/chat/chat-options";
@@ -16,33 +14,64 @@ interface ChatPageProps {
   chatId: string;
   setChatId: React.Dispatch<React.SetStateAction<string>>;
 }
+
+const defaultChatOptions: ChatOptions = {
+  selectedModel: "",
+  systemPrompt: "",
+  temperature: 0.9,
+};
+
+const getStoredChatOptions = (): ChatOptions => {
+  if (typeof window === "undefined") {
+    return defaultChatOptions;
+  }
+
+  const stored = window.localStorage.getItem("chatOptions");
+  return stored ? JSON.parse(stored) : defaultChatOptions;
+};
+
+const getChatErrorMessage = (error: Error) => {
+  try {
+    const response = JSON.parse(error.message) as { error?: unknown };
+
+    if (response.error === "VLLM_URL is not set") {
+      return "Set VLLM_URL in .env and restart the app";
+    }
+
+    if (typeof response.error === "string") {
+      return response.error;
+    }
+  } catch {
+    // Fall back to the original error message below.
+  }
+
+  return error.message.replace(/<[^>]*>/g, "").trim() || "Unknown chat error";
+};
+
 export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
   const {
     messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
+    sendMessage,
+    status,
     error,
     stop,
     setMessages,
   } = useChat({
-    api: basePath + "/api/chat",
-    streamMode: "stream-data",
+    transport: new DefaultChatTransport({
+      api: basePath + "/api/chat",
+    }),
     onError: (error) => {
-      toast.error("Something went wrong: " + error);
+      toast.error(`Chat request failed: ${getChatErrorMessage(error)}`);
     },
   });
-  const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
-    "chatOptions",
-    {
-      defaultValue: {
-        selectedModel: "",
-        systemPrompt: "",
-        temperature: 0.9,
-      },
-    }
-  );
+  const [input, setInput] = React.useState("");
+  const isLoading = status === "submitted" || status === "streaming";
+  const [chatOptions, setChatOptions] =
+    React.useState<ChatOptions>(getStoredChatOptions);
+
+  React.useEffect(() => {
+    window.localStorage.setItem("chatOptions", JSON.stringify(chatOptions));
+  }, [chatOptions]);
 
   React.useEffect(() => {
     if (chatId) {
@@ -69,7 +98,7 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
 
     if (messages.length === 0) {
       // Generate a random id for the chat
-      const id = uuidv4();
+      const id = crypto.randomUUID();
       setChatId(id);
     }
 
@@ -77,15 +106,13 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
 
     // Prepare the options object with additional body data, to pass the model.
     const requestOptions: ChatRequestOptions = {
-      options: {
-        body: {
-          chatOptions: chatOptions,
-        },
+      body: {
+        chatOptions: chatOptions,
       },
     };
 
-    // Call the handleSubmit function with the options
-    handleSubmit(e, requestOptions);
+    sendMessage({ text: input }, requestOptions);
+    setInput("");
   };
 
   return (
@@ -97,7 +124,7 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
         setChatOptions={setChatOptions}
         messages={messages}
         input={input}
-        handleInputChange={handleInputChange}
+        handleInputChange={(e) => setInput(e.target.value)}
         handleSubmit={onSubmit}
         isLoading={isLoading}
         error={error}

@@ -9,7 +9,6 @@ import {
   HamburgerMenuIcon,
   InfoCircledIcon,
 } from "@radix-ui/react-icons";
-import { Message } from "ai/react";
 import { toast } from "sonner";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { encodeChat, getTokenLimit } from "@/lib/token-counter";
 import { basePath, useHasMounted } from "@/lib/utils";
+import { ChatMessage } from "@/lib/chat-message";
 import { Sidebar } from "../sidebar";
 import { ChatOptions } from "./chat-options";
 
@@ -30,8 +30,16 @@ interface ChatTopbarProps {
   isLoading: boolean;
   chatId?: string;
   setChatId: React.Dispatch<React.SetStateAction<string>>;
-  messages: Message[];
+  messages: ChatMessage[];
 }
+
+const getConnectionHelpText = (message: string | undefined) => {
+  if (message === "VLLM_URL is not set") {
+    return "Set VLLM_URL in .env and restart the app";
+  }
+
+  return message ?? "Connection to vLLM server failed";
+};
 
 export default function ChatTopbar({
   chatOptions,
@@ -47,10 +55,11 @@ export default function ChatTopbar({
   const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
   const [error, setError] = React.useState<string | undefined>(undefined);
 
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
     if (!hasMounted) {
-      return null;
+      return;
     }
+
     try {
       const res = await fetch(basePath + "/api/models");
 
@@ -61,20 +70,38 @@ export default function ChatTopbar({
       }
 
       const data = await res.json();
-      // Extract the "name" field from each model object and store them in the state
-      const modelNames = data.data.map((model: any) => model.id);
-      // save the first and only model in the list as selectedModel in localstorage
-      setChatOptions({ ...chatOptions, selectedModel: modelNames[0] });
+      if (!Array.isArray(data.data) || data.data.length === 0) {
+        throw new Error("No models available from vLLM server");
+      }
+
+      const modelNames = data.data
+        .map((model: { id?: unknown }) => model.id)
+        .filter(
+          (id: unknown): id is string => typeof id === "string" && id !== ""
+        );
+
+      if (modelNames.length === 0) {
+        throw new Error("No usable model IDs returned from vLLM server");
+      }
+
+      setChatOptions((options) => ({
+        ...options,
+        selectedModel: modelNames[0],
+      }));
+      setError(undefined);
     } catch (error) {
-      setChatOptions({ ...chatOptions, selectedModel: undefined });
-      toast.error(error as string);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      setChatOptions((options) => ({ ...options, selectedModel: undefined }));
+      setError(errorMessage);
+      toast.error(getConnectionHelpText(errorMessage));
     }
-  };
+  }, [hasMounted, setChatOptions]);
 
   useEffect(() => {
     fetchData();
     getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
-  }, [hasMounted]);
+  }, [fetchData]);
 
   if (!hasMounted) {
     return (
@@ -141,7 +168,7 @@ export default function ChatTopbar({
           {currentModel === undefined && (
             <>
               <CrossCircledIcon className="w-4 h-4 text-red-500" />
-              <span className="text-xs">Connection to vLLM server failed</span>
+              <span className="text-xs">{getConnectionHelpText(error)}</span>
             </>
           )}
         </div>

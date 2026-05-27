@@ -5,11 +5,11 @@ import React from "react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { ChatBubbleIcon, GearIcon, TrashIcon } from "@radix-ui/react-icons";
 import * as Tabs from "@radix-ui/react-tabs";
-import { Message } from "ai/react";
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ChatMessage, getMessageContent } from "@/lib/chat-message";
 import { ChatOptions } from "./chat/chat-options";
 import Settings from "./settings";
 import SidebarSkeleton from "./sidebar-skeleton";
@@ -23,7 +23,7 @@ import {
 } from "./ui/dialog";
 
 interface Chats {
-  [key: string]: { chatId: string; messages: Message[] }[];
+  [key: string]: { chatId: string; messages: ChatMessage[] }[];
 }
 interface SidebarTabsProps {
   isLoading: boolean;
@@ -82,7 +82,7 @@ const SidebarTabs = ({
                               >
                                 <span className="text-sm font-normal max-w-[184px] truncate">
                                   {messages.length > 0
-                                    ? messages[0].content
+                                    ? getMessageContent(messages[0])
                                     : ""}
                                 </span>
                               </Link>

@@ -8,9 +8,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     headers.set("Authorization", `Bearer ${apiKey}`);
     headers.set("api-key", apiKey);
   }
-  if (!baseUrl) {
-    throw new Error("VLLM_URL is not set");
-  }
 
   const envModel = process.env.VLLM_MODEL;
   if (envModel) {
@@ -22,6 +19,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         },
       ],
     });
+  }
+
+  if (!baseUrl) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "VLLM_URL is not set",
+      },
+      { status: 503 }
+    );
   }
 
   try {

@@ -1,9 +1,11 @@
 import {
   streamText,
+  APICallError,
   CoreMessage,
   CoreUserMessage,
   CoreSystemMessage,
   CoreAssistantMessage,
+  convertToModelMessages,
 } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 
@@ -13,6 +15,10 @@ export const maxDuration = 30;
 import { NextRequest, NextResponse } from "next/server";
 
 import { encodeChat } from "@/lib/token-counter";
+
+(
+  globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: boolean }
+).AI_SDK_LOG_WARNINGS = false;
 
 const addSystemMessage = (messages: CoreMessage[], systemPrompt?: string) => {
   // early exit if system prompt is empty
@@ -105,6 +111,29 @@ const formatMessages = (
   return mappedMessages;
 };
 
+const getErrorMessage = (error: unknown) => {
+  if (APICallError.isInstance(error)) {
+    const responseData = error.data;
+    if (
+      responseData &&
+      typeof responseData === "object" &&
+      "error" in responseData
+    ) {
+      const responseError = responseData.error;
+      if (
+        responseError &&
+        typeof responseError === "object" &&
+        "message" in responseError &&
+        typeof responseError.message === "string"
+      ) {
+        return responseError.message;
+      }
+    }
+  }
+
+  return error instanceof Error ? error.message : "Unknown error";
+};
+
 export async function POST(req: Request) {
   // export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
@@ -115,7 +144,13 @@ export async function POST(req: Request) {
 
     const baseUrl = process.env.VLLM_URL;
     if (!baseUrl) {
-      throw new Error("VLLM_URL is not set");
+      return NextResponse.json(
+        {
+          success: false,
+          error: "VLLM_URL is not set",
+        },
+        { status: 503 }
+      );
     }
     const apiKey = process.env.VLLM_API_KEY;
 
@@ -124,18 +159,18 @@ export async function POST(req: Request) {
       : 4096;
 
     const formattedMessages = formatMessages(
-      addSystemMessage(messages, chatOptions.systemPrompt),
+      addSystemMessage(convertToModelMessages(messages), chatOptions.systemPrompt),
       tokenLimit
     );
 
     // Call the language model
     const customOpenai = createOpenAI({
-      baseUrl: baseUrl + "/v1",
+      baseURL: baseUrl + "/v1",
       apiKey: apiKey ?? "",
     });
 
     const result = await streamText({
-      model: customOpenai(chatOptions.selectedModel),
+      model: customOpenai.chat(chatOptions.selectedModel),
       messages: formattedMessages,
       temperature: chatOptions.temperature,
       // async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
@@ -145,14 +180,14 @@ export async function POST(req: Request) {
     });
 
     // Respond with the stream
-    return result.toAIStreamResponse();
+    return result.toUIMessageStreamResponse();
 
   } catch (error) {
-    console.error(error);
+    const errorMessage = getErrorMessage(error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: errorMessage,
       },
       { status: 500 }
     );

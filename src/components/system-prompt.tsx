@@ -3,7 +3,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { toast } from "sonner";
-import { useDebounce } from "use-debounce";
 
 import { useHasMounted } from "@/lib/utils";
 import { ChatOptions } from "./chat/chat-options";
@@ -21,17 +20,22 @@ export default function SystemPrompt({
 
   const systemPrompt = chatOptions ? chatOptions.systemPrompt : "";
   const [text, setText] = useState<string>(systemPrompt || "");
-  const [debouncedText] = useDebounce(text, 500);
 
   useEffect(() => {
     if (!hasMounted) {
       return;
     }
-    if (debouncedText !== systemPrompt) {
-      setChatOptions({ ...chatOptions, systemPrompt: debouncedText });
-      toast.success("System prompt updated", { duration: 1000 });
+    if (text === systemPrompt) {
+      return;
     }
-  }, [hasMounted, debouncedText]);
+
+    const timeout = window.setTimeout(() => {
+      setChatOptions({ ...chatOptions, systemPrompt: text });
+      toast.success("System prompt updated", { duration: 1000 });
+    }, 500);
+
+    return () => window.clearTimeout(timeout);
+  }, [hasMounted, text, systemPrompt, chatOptions, setChatOptions]);
 
   return (
     <div>

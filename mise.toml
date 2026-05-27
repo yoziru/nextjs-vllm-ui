@@ -1,0 +1,27 @@
+[tools]
+aube = "1.16.0"
+node = "24.15.0"
+
+[tasks.build]
+description = "Build the Docker image"
+run = "docker build . -t yoziru/nextjs-vllm-ui"
+
+[tasks.build-multi]
+description = "Build the Docker image for linux/amd64 and linux/arm64"
+run = "docker buildx build --platform linux/amd64,linux/arm64 . -t yoziru/nextjs-vllm-ui"
+
+[tasks.app]
+description = "Build and run the Docker image locally"
+depends = ["build"]
+run = """
+docker run --rm \
+  -p 3000:3000 \
+  -e VLLM_URL=${VLLM_URL} \
+  -e VLLM_TOKEN_LIMIT=${VLLM_TOKEN_LIMIT} \
+  -e VLLM_API_KEY=${VLLM_API_KEY} \
+  yoziru/nextjs-vllm-ui
+"""
+
+[tasks.audit]
+description = "Check dependencies for known vulnerabilities"
+run = "aube audit"

@@ -1,0 +1,16 @@
+# Aube security posture for dependency resolution and installs.
+# Time values are in minutes.
+minimumReleaseAge: 10080
+paranoid: true
+trustPolicy: no-downgrade
+advisoryCheckEveryInstall: true
+blockExoticSubdeps: true
+strictDepBuilds: true
+jailBuilds: true
+enableGlobalVirtualStore: false
+deprecationWarnings: summary
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+overrides:
+  postcss: 8.5.15

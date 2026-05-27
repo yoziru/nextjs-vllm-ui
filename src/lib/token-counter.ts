@@ -1,26 +1,37 @@
-import { CoreMessage, Message } from "ai";
+import { CoreMessage } from "ai";
 import llama3Tokenizer from "llama3-tokenizer-js";
 
-export const getTokenLimit = async (basePath: string) => {
-  const res = await fetch(basePath + "/api/settings");
+import { ChatMessage, getMessageContent } from "@/lib/chat-message";
 
-  if (!res.ok) {
-    const errorResponse = await res.json();
-    const errorMessage = `Connection to vLLM server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
-    throw new Error(errorMessage);
+const DEFAULT_TOKEN_LIMIT = 4096;
+
+export const getTokenLimit = async (basePath: string): Promise<number> => {
+  try {
+    const res = await fetch(basePath + "/api/settings");
+
+    if (!res.ok) {
+      return DEFAULT_TOKEN_LIMIT;
+    }
+
+    const data: { tokenLimit?: unknown } = await res.json();
+    return typeof data.tokenLimit === "number"
+      ? data.tokenLimit
+      : DEFAULT_TOKEN_LIMIT;
+  } catch (error) {
+    return DEFAULT_TOKEN_LIMIT;
   }
-  const data = await res.json();
-  return data.tokenLimit;
 };
 
-export const encodeChat = (messages: Message[] | CoreMessage[]): number => {
+export const encodeChat = (messages: ChatMessage[] | CoreMessage[]): number => {
   const tokensPerMessage = 3;
   let numTokens = 0;
   for (const message of messages) {
     numTokens += tokensPerMessage;
     numTokens += llama3Tokenizer.encode(message.role).length;
-    if (typeof message.content === "string") {
-      numTokens += llama3Tokenizer.encode(message.content).length;
+    const content =
+      "parts" in message ? getMessageContent(message) : message.content;
+    if (typeof content === "string") {
+      numTokens += llama3Tokenizer.encode(content).length;
     }
   }
   numTokens += 3;

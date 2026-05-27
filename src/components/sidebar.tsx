@@ -2,13 +2,13 @@
 import { useEffect, useState } from "react";
 
 import { Pencil2Icon } from "@radix-ui/react-icons";
-import { Message } from "ai/react";
 import Image from "next/image";
 
 import OllamaLogo from "../../public/ollama.png";
 import { ChatOptions } from "./chat/chat-options";
 import SidebarTabs from "./sidebar-tabs";
 import Link from "next/link";
+import { ChatMessage } from "@/lib/chat-message";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -21,7 +21,7 @@ interface SidebarProps {
 }
 
 interface Chats {
-  [key: string]: { chatId: string; messages: Message[] }[];
+  [key: string]: { chatId: string; messages: ChatMessage[] }[];
 }
 
 export function Sidebar({
@@ -71,7 +71,7 @@ export function Sidebar({
     });
 
     const groupChatsByDate = (
-      chats: { chatId: string; messages: Message[] }[]
+      chats: { chatId: string; messages: ChatMessage[] }[]
     ) => {
       const today = new Date();
       const yesterday = new Date(today);
