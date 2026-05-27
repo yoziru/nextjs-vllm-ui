@@ -41,7 +41,6 @@ time:
   tailwindcss@3.4.17: 2024-12-17T19:36:41.075Z
   typescript-eslint@7.18.0: 2024-07-29T17:16:49.769Z
   typescript@5.8.3: 2025-04-05T00:17:37.851Z
-  use-local-storage-state@19.5.0: 2024-11-13T11:18:39.166Z
   zod@3.25.76: 2025-07-08T09:10:18.684Z
 
 importers:
@@ -114,9 +113,6 @@ importers:
       tailwind-merge:
         specifier: 3.6.0
         version: 3.6.0
-      use-local-storage-state:
-        specifier: 19.5.0
-        version: 19.5.0(react@18.3.1)(react-dom@18.3.1(react@18.3.1))
       zod:
         specifier: 3.25.76
         version: 3.25.76
@@ -2768,13 +2764,6 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  use-local-storage-state@19.5.0:
-    resolution: {integrity: sha512-sUJAyFvsmqMpBhdwaRr7GTKkkoxb6PWeNVvpBDrLuwQF1PpbJRKIbOYeLLeqJI7B3wdfFlLLCBbmOdopiSTBOw==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      react: '>=18'
-      react-dom: '>=18'
 
   use-sidecar@1.1.3:
     resolution: {integrity: sha512-Fedw0aZvkhynoPYlA5WXrMCAMm+nSWdZt6lzJQ7Ok8S6Q+VsHmHpRWndVRJ8Be0ZbkfPc5LRYH+5XrzXcEeLRQ==}
@@ -5753,11 +5742,6 @@ snapshots:
     dependencies:
       react: 18.3.1
       use-isomorphic-layout-effect: 1.2.1(react@18.3.1)
-
-  use-local-storage-state@19.5.0(react@18.3.1)(react-dom@18.3.1(react@18.3.1)):
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   use-sidecar@1.1.3(@types/react@18.3.20)(react@18.3.1):
     dependencies:

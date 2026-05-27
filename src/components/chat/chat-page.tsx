@@ -5,7 +5,6 @@ import React from "react";
 import { ChatRequestOptions, DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
 import { toast } from "sonner";
-import useLocalStorageState from "use-local-storage-state";
 
 import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatOptions } from "@/components/chat/chat-options";
@@ -15,6 +14,22 @@ interface ChatPageProps {
   chatId: string;
   setChatId: React.Dispatch<React.SetStateAction<string>>;
 }
+
+const defaultChatOptions: ChatOptions = {
+  selectedModel: "",
+  systemPrompt: "",
+  temperature: 0.9,
+};
+
+const getStoredChatOptions = (): ChatOptions => {
+  if (typeof window === "undefined") {
+    return defaultChatOptions;
+  }
+
+  const stored = window.localStorage.getItem("chatOptions");
+  return stored ? JSON.parse(stored) : defaultChatOptions;
+};
+
 export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
   const {
     messages,
@@ -33,16 +48,12 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
   });
   const [input, setInput] = React.useState("");
   const isLoading = status === "submitted" || status === "streaming";
-  const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
-    "chatOptions",
-    {
-      defaultValue: {
-        selectedModel: "",
-        systemPrompt: "",
-        temperature: 0.9,
-      },
-    }
-  );
+  const [chatOptions, setChatOptions] =
+    React.useState<ChatOptions>(getStoredChatOptions);
+
+  React.useEffect(() => {
+    window.localStorage.setItem("chatOptions", JSON.stringify(chatOptions));
+  }, [chatOptions]);
 
   React.useEffect(() => {
     if (chatId) {
