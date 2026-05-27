@@ -1,5 +1,6 @@
 [tools]
 aube = "1.16.0"
+node = "24.15.0"
 
 [tasks.build]
 description = "Build the Docker image"

@@ -1,4 +1,4 @@
-ARG NODE_VERSION=lts
+ARG NODE_VERSION=24.15.0
 ARG AUBE_VERSION=1.16.0
 # Install dependencies only when needed
 FROM node:$NODE_VERSION-alpine AS builder
