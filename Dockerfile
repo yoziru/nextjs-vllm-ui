@@ -1,13 +1,14 @@
 ARG NODE_VERSION=lts
+ARG AUBE_VERSION=1.16.0
 # Install dependencies only when needed
 FROM node:$NODE_VERSION-alpine AS builder
-ENV YARN_CACHE_FOLDER=/opt/yarncache
+ARG AUBE_VERSION
 WORKDIR /opt/app
 
-# Copy only the necessary files for Yarn
-COPY .yarnrc.yml package.json yarn.lock ./
+# Copy only the necessary files for dependency installation
+COPY package.json yarn.lock aube-workspace.yaml .npmrc ./
 
-RUN corepack enable && yarn install --immutable
+RUN npm install -g --ignore-scripts=false @endevco/aube@$AUBE_VERSION && aube ci
 # patch logging for requestHandler
 RUN sed -Ei \
     -e '/await requestHandler/iconst __start = new Date;' \
@@ -20,7 +21,7 @@ ENV VLLM_URL=""
 ENV VLLM_API_KEY=""
 
 COPY . .
-RUN yarn build
+RUN aube build
 
 # Production image, copy all the files and run next
 FROM node:$NODE_VERSION-alpine AS runner
@@ -44,9 +45,9 @@ COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/static ./.next/static
 
 # Copy only the necessary files for runtime
-COPY --from=builder /opt/app/.yarnrc.yml ./
 COPY --from=builder /opt/app/package.json ./
 COPY --from=builder /opt/app/yarn.lock ./
+COPY --from=builder /opt/app/aube-workspace.yaml ./
 
 USER nextjs
 

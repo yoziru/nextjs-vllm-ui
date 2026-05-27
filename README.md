@@ -33,7 +33,7 @@ https://github.com/jakobhoeg/nextjs-ollama-llm-ui/assets/114422072/08eaed4f-9deb
 To use the web interface, these requisites must be met:
 
 1. Download [vLLM](https://docs.vllm.ai/en/latest/) and have it running. Or run it in a Docker container.
-2. [Node.js](https://nodejs.org/en/download) (18+), [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) is required.
+2. [Node.js](https://nodejs.org/en/download) (18+) and [mise](https://mise.jdx.dev/) are required. This project pins [Aube](https://aube.en.dev/) for package management.
 
 # Usage 🚀
 
@@ -91,13 +91,14 @@ To install and run a local environment of the web interface, follow the instruct
 1. **Install dependencies:**
 
    ```
-   yarn install
+   mise install
+   aube install
    ```
 
 1. **Start the development server:**
 
    ```
-   yarn dev
+   aube dev
    ```
 
 1. **Go to [localhost:3000](http://localhost:3000) and start chatting with your favourite model!**

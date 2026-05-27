@@ -1,0 +1,7 @@
+# Aube security posture for dependency resolution and installs.
+# Time values are in minutes.
+minimumReleaseAge: 10080
+paranoid: true
+advisoryCheckEveryInstall: true
+blockExoticSubdeps: true
+deprecationWarnings: summary
