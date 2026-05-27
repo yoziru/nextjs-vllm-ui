@@ -4,6 +4,7 @@ import {
   CoreUserMessage,
   CoreSystemMessage,
   CoreAssistantMessage,
+  convertToModelMessages,
 } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 
@@ -124,13 +125,13 @@ export async function POST(req: Request) {
       : 4096;
 
     const formattedMessages = formatMessages(
-      addSystemMessage(messages, chatOptions.systemPrompt),
+      addSystemMessage(convertToModelMessages(messages), chatOptions.systemPrompt),
       tokenLimit
     );
 
     // Call the language model
     const customOpenai = createOpenAI({
-      baseUrl: baseUrl + "/v1",
+      baseURL: baseUrl + "/v1",
       apiKey: apiKey ?? "",
     });
 
@@ -145,7 +146,7 @@ export async function POST(req: Request) {
     });
 
     // Respond with the stream
-    return result.toAIStreamResponse();
+    return result.toUIMessageStreamResponse();
 
   } catch (error) {
     console.error(error);

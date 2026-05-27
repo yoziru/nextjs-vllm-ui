@@ -1,5 +1,7 @@
-import { CoreMessage, Message } from "ai";
+import { CoreMessage } from "ai";
 import llama3Tokenizer from "llama3-tokenizer-js";
+
+import { ChatMessage, getMessageContent } from "@/lib/chat-message";
 
 export const getTokenLimit = async (basePath: string) => {
   const res = await fetch(basePath + "/api/settings");
@@ -13,14 +15,16 @@ export const getTokenLimit = async (basePath: string) => {
   return data.tokenLimit;
 };
 
-export const encodeChat = (messages: Message[] | CoreMessage[]): number => {
+export const encodeChat = (messages: ChatMessage[] | CoreMessage[]): number => {
   const tokensPerMessage = 3;
   let numTokens = 0;
   for (const message of messages) {
     numTokens += tokensPerMessage;
     numTokens += llama3Tokenizer.encode(message.role).length;
-    if (typeof message.content === "string") {
-      numTokens += llama3Tokenizer.encode(message.content).length;
+    const content =
+      "parts" in message ? getMessageContent(message) : message.content;
+    if (typeof content === "string") {
+      numTokens += llama3Tokenizer.encode(content).length;
     }
   }
   numTokens += 3;

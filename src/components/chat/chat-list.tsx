@@ -6,11 +6,11 @@ import OllamaLogo from "../../../public/ollama.png";
 import CodeDisplayBlock from "../code-display-block";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Message } from "ai";
 import ThinkBlock from "../think-block";
+import { ChatMessage, getMessageContent } from "@/lib/chat-message";
 
 interface ChatListProps {
-  messages: Message[];
+  messages: ChatMessage[];
   isLoading: boolean;
 }
 
@@ -24,7 +24,7 @@ const MessageToolbar = () => (
 );
 
 // Utility to process <think> tags
-function processThinkTags(content: string, isLoading: boolean, message: Message | undefined, prevUserMessage: Message | undefined) {
+function processThinkTags(content: string, isLoading: boolean, message: ChatMessage | undefined, prevUserMessage: ChatMessage | undefined) {
   const thinkOpen = content.indexOf("<think>");
   const thinkClose = content.indexOf("</think>");
 
@@ -131,7 +131,7 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
                   <div className="relative flex w-full min-w-0 flex-col">
                     <div className="font-semibold pb-2">You</div>
                     <div className="flex-col gap-1 md:gap-3">
-                      {message.content}
+                      {getMessageContent(message)}
                     </div>
                     <MessageToolbar />
                   </div>
@@ -142,7 +142,7 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
                     <div className="flex-col gap-1 md:gap-3">
                       <span className="whitespace-pre-wrap">
                         {/* Check if the message content contains a code block */}
-                        {message.content.split("```").map((part, index) => {
+                        {getMessageContent(message).split("```").map((part, index) => {
                           if (index % 2 === 0) {
                             // Find previous user message
                             const prevUserMessage = messages.slice(0, messages.indexOf(message)).reverse().find(m => m.role === "user");

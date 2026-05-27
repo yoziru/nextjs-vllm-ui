@@ -1,17 +1,17 @@
 import React from "react";
 
 import { ChatRequestOptions } from "ai";
-import { Message } from "ai/react";
 
 import ChatBottombar from "./chat-bottombar";
 import ChatList from "./chat-list";
 import { ChatOptions } from "./chat-options";
 import ChatTopbar from "./chat-topbar";
+import { ChatMessage } from "@/lib/chat-message";
 
 export interface ChatProps {
   chatId?: string;
   setChatId: React.Dispatch<React.SetStateAction<string>>;
-  messages: Message[];
+  messages: ChatMessage[];
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleSubmit: (

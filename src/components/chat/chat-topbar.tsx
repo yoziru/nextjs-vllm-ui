@@ -9,7 +9,6 @@ import {
   HamburgerMenuIcon,
   InfoCircledIcon,
 } from "@radix-ui/react-icons";
-import { Message } from "ai/react";
 import { toast } from "sonner";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { encodeChat, getTokenLimit } from "@/lib/token-counter";
 import { basePath, useHasMounted } from "@/lib/utils";
+import { ChatMessage } from "@/lib/chat-message";
 import { Sidebar } from "../sidebar";
 import { ChatOptions } from "./chat-options";
 
@@ -30,7 +30,7 @@ interface ChatTopbarProps {
   isLoading: boolean;
   chatId?: string;
   setChatId: React.Dispatch<React.SetStateAction<string>>;
-  messages: Message[];
+  messages: ChatMessage[];
 }
 
 export default function ChatTopbar({

@@ -4,4 +4,12 @@ minimumReleaseAge: 10080
 paranoid: true
 advisoryCheckEveryInstall: true
 blockExoticSubdeps: true
+jailBuilds: true
+enableGlobalVirtualStore: false
 deprecationWarnings: summary
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+overrides:
+  postcss: 8.5.15
+  prismjs: 1.30.0

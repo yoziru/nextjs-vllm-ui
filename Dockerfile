@@ -6,7 +6,7 @@ ARG AUBE_VERSION
 WORKDIR /opt/app
 
 # Copy only the necessary files for dependency installation
-COPY package.json yarn.lock aube-workspace.yaml .npmrc ./
+COPY package.json aube-lock.yaml aube-workspace.yaml ./
 
 RUN npm install -g --ignore-scripts=false @endevco/aube@$AUBE_VERSION && aube ci
 # patch logging for requestHandler
@@ -46,7 +46,7 @@ COPY --from=builder --chown=nextjs:nodejs /opt/app/.next/static ./.next/static
 
 # Copy only the necessary files for runtime
 COPY --from=builder /opt/app/package.json ./
-COPY --from=builder /opt/app/yarn.lock ./
+COPY --from=builder /opt/app/aube-lock.yaml ./
 COPY --from=builder /opt/app/aube-workspace.yaml ./
 
 USER nextjs

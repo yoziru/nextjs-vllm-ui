@@ -2,8 +2,8 @@
 
 import React from "react";
 
-import { ChatRequestOptions } from "ai";
-import { useChat } from "ai/react";
+import { ChatRequestOptions, DefaultChatTransport } from "ai";
+import { useChat } from "@ai-sdk/react";
 import { toast } from "sonner";
 import useLocalStorageState from "use-local-storage-state";
 import { v4 as uuidv4 } from "uuid";
@@ -19,20 +19,21 @@ interface ChatPageProps {
 export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
   const {
     messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
+    sendMessage,
+    status,
     error,
     stop,
     setMessages,
   } = useChat({
-    api: basePath + "/api/chat",
-    streamMode: "stream-data",
+    transport: new DefaultChatTransport({
+      api: basePath + "/api/chat",
+    }),
     onError: (error) => {
       toast.error("Something went wrong: " + error);
     },
   });
+  const [input, setInput] = React.useState("");
+  const isLoading = status === "submitted" || status === "streaming";
   const [chatOptions, setChatOptions] = useLocalStorageState<ChatOptions>(
     "chatOptions",
     {
@@ -77,15 +78,13 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
 
     // Prepare the options object with additional body data, to pass the model.
     const requestOptions: ChatRequestOptions = {
-      options: {
-        body: {
-          chatOptions: chatOptions,
-        },
+      body: {
+        chatOptions: chatOptions,
       },
     };
 
-    // Call the handleSubmit function with the options
-    handleSubmit(e, requestOptions);
+    sendMessage({ text: input }, requestOptions);
+    setInput("");
   };
 
   return (
@@ -97,7 +96,7 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
         setChatOptions={setChatOptions}
         messages={messages}
         input={input}
-        handleInputChange={handleInputChange}
+        handleInputChange={(e) => setInput(e.target.value)}
         handleSubmit={onSubmit}
         isLoading={isLoading}
         error={error}

@@ -20,3 +20,7 @@ docker run --rm \
   -e VLLM_API_KEY=${VLLM_API_KEY} \
   yoziru/nextjs-vllm-ui
 """
+
+[tasks.audit]
+description = "Check dependencies for known vulnerabilities"
+run = "aube audit"
