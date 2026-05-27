@@ -3,16 +3,23 @@ import llama3Tokenizer from "llama3-tokenizer-js";
 
 import { ChatMessage, getMessageContent } from "@/lib/chat-message";
 
-export const getTokenLimit = async (basePath: string) => {
-  const res = await fetch(basePath + "/api/settings");
+const DEFAULT_TOKEN_LIMIT = 4096;
 
-  if (!res.ok) {
-    const errorResponse = await res.json();
-    const errorMessage = `Connection to vLLM server failed: ${errorResponse.error} [${res.status} ${res.statusText}]`;
-    throw new Error(errorMessage);
+export const getTokenLimit = async (basePath: string): Promise<number> => {
+  try {
+    const res = await fetch(basePath + "/api/settings");
+
+    if (!res.ok) {
+      return DEFAULT_TOKEN_LIMIT;
+    }
+
+    const data: { tokenLimit?: unknown } = await res.json();
+    return typeof data.tokenLimit === "number"
+      ? data.tokenLimit
+      : DEFAULT_TOKEN_LIMIT;
+  } catch (error) {
+    return DEFAULT_TOKEN_LIMIT;
   }
-  const data = await res.json();
-  return data.tokenLimit;
 };
 
 export const encodeChat = (messages: ChatMessage[] | CoreMessage[]): number => {

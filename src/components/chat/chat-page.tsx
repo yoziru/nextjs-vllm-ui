@@ -30,6 +30,24 @@ const getStoredChatOptions = (): ChatOptions => {
   return stored ? JSON.parse(stored) : defaultChatOptions;
 };
 
+const getChatErrorMessage = (error: Error) => {
+  try {
+    const response = JSON.parse(error.message) as { error?: unknown };
+
+    if (response.error === "VLLM_URL is not set") {
+      return "Set VLLM_URL in .env and restart the app";
+    }
+
+    if (typeof response.error === "string") {
+      return response.error;
+    }
+  } catch {
+    // Fall back to the original error message below.
+  }
+
+  return error.message.replace(/<[^>]*>/g, "").trim() || "Unknown chat error";
+};
+
 export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
   const {
     messages,
@@ -43,7 +61,7 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
       api: basePath + "/api/chat",
     }),
     onError: (error) => {
-      toast.error("Something went wrong: " + error);
+      toast.error(`Chat request failed: ${getChatErrorMessage(error)}`);
     },
   });
   const [input, setInput] = React.useState("");

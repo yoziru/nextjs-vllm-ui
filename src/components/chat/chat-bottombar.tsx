@@ -44,6 +44,10 @@ export default function ChatBottombar({
 
   const [tokenLimit, setTokenLimit] = React.useState<number>(4096);
   React.useEffect(() => {
+    if (!hasMounted) {
+      return;
+    }
+
     getTokenLimit(basePath).then((limit) => setTokenLimit(limit));
   }, [hasMounted]);
 
