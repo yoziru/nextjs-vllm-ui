@@ -2,8 +2,6 @@
 import React from "react";
 
 import { CheckIcon, CopyIcon } from "@radix-ui/react-icons";
-import { useTheme } from "next-themes";
-import { CodeBlock, dracula, github } from "react-code-blocks";
 import { toast } from "sonner";
 
 import { Button } from "./ui/button";
@@ -15,7 +13,6 @@ interface ButtonCodeblockProps {
 
 export default function CodeDisplayBlock({ code, lang }: ButtonCodeblockProps) {
   const [isCopied, setisCopied] = React.useState(false);
-  const { theme } = useTheme();
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(code);
@@ -27,18 +24,10 @@ export default function CodeDisplayBlock({ code, lang }: ButtonCodeblockProps) {
   };
 
   return (
-    <div className="relative my-4 overflow-scroll overflow-x-scroll  flex flex-col   text-start  ">
-      <CodeBlock
-        customStyle={
-          theme === "dark"
-            ? { background: "#303033" }
-            : { background: "#fcfcfc" }
-        }
-        text={code}
-        language="tsx"
-        showLineNumbers={false}
-        theme={theme === "dark" ? dracula : github}
-      />
+    <div className="relative my-4 overflow-scroll overflow-x-scroll flex flex-col text-start">
+      <pre className="rounded-md bg-slate-50 p-4 text-sm text-slate-950 dark:bg-[#303033] dark:text-slate-50">
+        <code data-language={lang || undefined}>{code}</code>
+      </pre>
       <Button
         onClick={copyToClipboard}
         variant="ghost"

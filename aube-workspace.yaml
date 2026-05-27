@@ -14,4 +14,3 @@ allowBuilds:
   unrs-resolver: true
 overrides:
   postcss: 8.5.15
-  prismjs: 1.30.0
