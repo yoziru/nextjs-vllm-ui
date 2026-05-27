@@ -43,7 +43,6 @@ time:
   typescript@5.8.3: 2025-04-05T00:17:37.851Z
   use-debounce@10.0.4: 2024-10-13T18:05:27.585Z
   use-local-storage-state@19.5.0: 2024-11-13T11:18:39.166Z
-  uuid@11.1.1: 2026-04-29T15:17:24.795Z
   zod@3.25.76: 2025-07-08T09:10:18.684Z
 
 importers:
@@ -122,9 +121,6 @@ importers:
       use-local-storage-state:
         specifier: 19.5.0
         version: 19.5.0(react@18.3.1)(react-dom@18.3.1(react@18.3.1))
-      uuid:
-        specifier: 11.1.1
-        version: 11.1.1
       zod:
         specifier: 3.25.76
         version: 3.25.76
@@ -2807,10 +2803,6 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
-
-  uuid@11.1.1:
-    resolution: {integrity: sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==}
-    hasBin: true
 
   vfile-message@4.0.3:
     resolution: {integrity: sha512-QTHzsGd1EhbZs4AsQ20JX1rC3cOlt/IWJruk893DfLRr57lcnOeMaWG4K0JrRta4mIJZKth2Au3mM3u03/JWKw==}
@@ -5793,8 +5785,6 @@ snapshots:
       react: 18.3.1
 
   util-deprecate@1.0.2: {}
-
-  uuid@11.1.1: {}
 
   vfile-message@4.0.3:
     dependencies:

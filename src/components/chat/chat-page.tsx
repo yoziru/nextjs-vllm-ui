@@ -6,7 +6,6 @@ import { ChatRequestOptions, DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
 import { toast } from "sonner";
 import useLocalStorageState from "use-local-storage-state";
-import { v4 as uuidv4 } from "uuid";
 
 import { ChatLayout } from "@/components/chat/chat-layout";
 import { ChatOptions } from "@/components/chat/chat-options";
@@ -70,7 +69,7 @@ export default function ChatPage({ chatId, setChatId }: ChatPageProps) {
 
     if (messages.length === 0) {
       // Generate a random id for the chat
-      const id = uuidv4();
+      const id = crypto.randomUUID();
       setChatId(id);
     }
 
