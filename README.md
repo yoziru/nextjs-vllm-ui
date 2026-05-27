@@ -106,13 +106,10 @@ To install and run a local environment of the web interface, follow the instruct
 You can also build and run the docker image locally with this command:
 
 ```sh
-docker build . -t ghcr.io/yoziru/nextjs-vllm-ui:latest \
- && docker run --rm \
-  -p 3000:3000 \
-  -e VLLM_URL=http://host.docker.internal:11434 \
-  -e VLLM_MODEL=llama3.1:8b-instruct-q8_0 \
-  -e NEXT_PUBLIC_TOKEN_LIMIT="8192" \
-  ghcr.io/yoziru/nextjs-vllm-ui:latest
+VLLM_URL=http://host.docker.internal:11434 \
+VLLM_TOKEN_LIMIT=8192 \
+VLLM_API_KEY= \
+mise run app
 ```
 
 # Tech stack
