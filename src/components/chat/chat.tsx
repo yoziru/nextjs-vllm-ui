@@ -42,7 +42,7 @@ export default function Chat({
   setChatId,
 }: ChatProps & ChatTopbarProps) {
   return (
-    <div className="flex flex-col justify-between w-full h-full  ">
+    <div className="flex flex-col w-full h-full overflow-y-auto">
       <ChatTopbar
         chatOptions={chatOptions}
         setChatOptions={setChatOptions}
