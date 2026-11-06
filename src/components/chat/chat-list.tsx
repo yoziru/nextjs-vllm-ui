@@ -81,7 +81,7 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
 
   if (messages.length === 0) {
     return (
-      <div className="w-full h-full flex justify-center items-center">
+      <div className="w-full flex-1 flex justify-center items-center">
         <div className="flex flex-col gap-4 items-center">
           <Image
             src={OllamaLogo}
@@ -101,9 +101,9 @@ export default function ChatList({ messages, isLoading }: ChatListProps) {
   return (
     <div
       id="scroller"
-      className="w-[800px] overflow-y-scroll overflow-x-hidden h-full justify-center m-auto"
+      className="flex-1 w-full overflow-x-hidden justify-center"
     >
-      <div className="px-4 py-2 justify-center text-base md:gap-6 m-auto">
+      <div className="w-[800px] max-w-full px-4 py-2 justify-center text-base md:gap-6 m-auto">
         {messages
           .filter((message) => message.role !== "system")
           .map((message, index) => (
